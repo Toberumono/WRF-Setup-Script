@@ -7,7 +7,7 @@ fet=$force_extract_tars #for convenience
 
 #In order to run ./configure and WRF/WPS compilations such that the user can modify the files later, we need to execute
 #sudo -u <username>.  However, getting the right username is a bit tricky.  This is the solution:
-[ $SUDO_USER ] && caller=$SUDO_USER || caller=whoami
+[ $SUDO_USER ] && caller=$SUDO_USER || caller="$(whoami)"
 unsudo="sudo -u $caller"
 
 set -e

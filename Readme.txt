@@ -24,4 +24,5 @@ zlib-bin
 3) Download the tarballs pf appropriate versions of MPICH, Hydra, NetCDF, NetCDF fortran, and HDF5, and place the tarballs in the same directory as the WRFSetup script.
 
 4) Update the version numbers in the variables file and set use_ld to true if appropriate.
-5) Run the script as sudo.  It will automatically unpack all of the tarballs, and then configure, test, and install everything, as well as print the output of all of the steps to appropriate log files.  Make sure to be careful when selecting the WRF configuration options.  However, if you mess up, you can always run this script again (and it'll run faster because it'll be able to skip all of the installations.
+5) The first time you run the script, it must be run as sudo.  It will automatically unpack all of the tarballs, and then configure, test, and install everything, as well as print the output of all of the steps to appropriate log files.  Make sure to be careful when selecting the WRF configuration options.  However, if you mess up, you can always run this script again (and it'll run faster because it'll be able to skip all of the installations.
+6) Once all of the installations are successful, you can run the script without sudo privileges.
