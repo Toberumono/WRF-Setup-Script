@@ -8,6 +8,7 @@ wrf_major_version="3"
 wrf_minor_version="7"
 
 #Toggles for optional components
+keep_namelists=true #WRF sometimes deletes namelist files on recompile.  This backs them up. [Default: true]
 use_ld=false #For gcc version 4.9.x, set this to true [Default: false]
 use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
 use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
@@ -34,3 +35,13 @@ netcdf_fortran_path="netcdf-fortran-$netcdf_fortran_version"
 WRF_path="WRFV$wrf_major_version"
 WRF_Chem_path="$WRF_path/chem"
 WPS_path="WPS"
+
+
+#DO NOT EDIT BELOW THIS LINE
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"

@@ -9,6 +9,17 @@ fet=$force_extract_tars #for convenience
 #If we aren't running as sudo, then we don't need this command, so it is set to ""
 [ $SUDO_USER ] && unsudo="sudo -u $SUDO_USER" || unsudo=""
 
+if ( ! $keep_namelists ); then
+	read -p "keep_namelists in 'variables' is currently set to false. If you proceed, you will loose any existing namelist files. Is this okay? [y/N] " yn
+	declare -l yn
+	if [ "$yn" != "y" ]; then
+		keep_namelists=true
+		echo "Changed keep_namelists to true for this run. Please change the value in 'variables' if you wish to avoid this prompt."
+	else
+		read -p "Leaving keep_namelists false. Some existing namelists may be deleted. Press [Enter] to continue."
+	fi
+fi
+
 set -e
 set -o nounset
 
@@ -21,10 +32,6 @@ $fet || [ ! -d "$netcdf_fortran_path" ] && $unsudo tar zxvf netcdf-fortran-$netc
 $fet || [ ! -d "$WRF_path" ]		&& $unsudo tar zxvf WRFV$wrf_version.tar.gz || echo "Already extracted WRF"
 $fet || [ ! -d "$WRF_Chem_path" ]	&& $unsudo tar zxvf WRFV$wrf_major_version-Chem-$wrf_version.tar.gz -C $WRF_path || echo "Already extracted WRF-Chem"
 $fet || [ ! -d "$WPS_path" ]		&& $unsudo tar zxvf WPSV$wrf_version.tar.gz || echo "Already extracted WPS"
-
-#cd openmpi-$mpicc_version
-#$unsudo ./configure --prefix=$openmpi_prefix $ld_flag 2>&1 | $unsudo tee ./configure.log
-#make all install 2>&1 | $unsudo tee ./make.log
 
 if (! $skip_mpich ); then
 	if (! $lazy_recompile) || [ ! -d "$hydra_prefix" ]; then
@@ -105,6 +112,9 @@ else
 fi
 
 cd $WRF_path
+if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
+	$unsudo cp "./run/namelist.input" "namelist.input.back"
+fi
 $unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers $flags 2>&1 | $unsudo tee ./configure.log
 if ( $use_wrf_regex_fixes ); then
 	$unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf
@@ -121,10 +131,15 @@ if [ $(echo ${#test_case}) -gt 4 ] && [ "$test_case" != "" -a "$test_case" != "n
 else
     echo "Skipping compiling a test case."
 fi
+if ( $keep_namelists ) && [ -e "namelist.input.back" ]; then
+	$unsudo mv "namelist.input.back" "./run/namelist.input"
+fi
 cd ../
 
-
 cd $WPS_path
+if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
+	$unsudo cp "./namelist.wps" "namelist.wps.back"
+fi
 $unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers $flags #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
 echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
 echo "However, this script fixes those problems, so... No need to worry about it."
@@ -137,6 +152,9 @@ else
 fi
 $unsudo `NETCDF=$netcdf_prefix $compilers` ./compile 2>&1 | $unsudo tee ./compile.log
 $unsudo `NETCDF=$netcdf_prefix $compilers` ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
+if ( $keep_namelists ) && [ -e "namelist.wps.back" ]; then
+	$unsudo mv "namelist.wps.back" "./namelist.wps"
+fi
 cd ../
 
 echo "Please confirm that all of the executables have been appropriately created in the WRFV$wrf_major_version and WPSV$wrf_major_version directories."
