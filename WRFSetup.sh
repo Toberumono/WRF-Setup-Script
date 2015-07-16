@@ -113,7 +113,7 @@ fi
 
 cd $WRF_path
 if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
-	$unsudo cp "./run/namelist.input" "namelist.input.back"
+	$unsudo cp "./run/namelist.input" "$DIR/namelist.input.back"
 fi
 $unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers $flags 2>&1 | $unsudo tee ./configure.log
 if ( $use_wrf_regex_fixes ); then
@@ -131,14 +131,14 @@ if [ $(echo ${#test_case}) -gt 4 ] && [ "$test_case" != "" -a "$test_case" != "n
 else
     echo "Skipping compiling a test case."
 fi
-if ( $keep_namelists ) && [ -e "namelist.input.back" ]; then
-	$unsudo mv "namelist.input.back" "./run/namelist.input"
+if ( $keep_namelists ) && [ -e "$DIR/namelist.input.back" ]; then
+	$unsudo mv "$DIR/namelist.input.back" "./run/namelist.input"
 fi
 cd ../
 
 cd $WPS_path
 if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
-	$unsudo cp "./namelist.wps" "namelist.wps.back"
+	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
 fi
 $unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers $flags #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
 echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
@@ -152,8 +152,8 @@ else
 fi
 $unsudo `NETCDF=$netcdf_prefix $compilers` ./compile 2>&1 | $unsudo tee ./compile.log
 $unsudo `NETCDF=$netcdf_prefix $compilers` ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
-if ( $keep_namelists ) && [ -e "namelist.wps.back" ]; then
-	$unsudo mv "namelist.wps.back" "./namelist.wps"
+if ( $keep_namelists ) && [ -e "$DIR/namelist.wps.back" ]; then
+	$unsudo mv "$DIR/namelist.wps.back" "./namelist.wps"
 fi
 cd ../
 
