@@ -2,13 +2,12 @@
 . variables
 fet=$force_extract_tars #for convenience
 [ $use_ld ] && ld_flag="--with-gnu-ld" || ld_flag=""
-#mpi_path=$openmpi_prefix"/bin/mpicc"
-#mpich_path=$mpich_prefix"/bin"
 
-#In order to run ./configure and WRF/WPS compilations such that the user can modify the files later, we need to execute
-#sudo -u <username>.  However, getting the right username is a bit tricky.  This is the solution:
-[ $SUDO_USER ] && caller=$SUDO_USER || caller="$(whoami)"
-unsudo="sudo -u $caller"
+#In order to run the WRF and WPS configure and compile scripts as the user that called this script
+#(so that the files can be edited without sudo) when this script is called, we have to use sudo to
+#specifically switch back to that user for the duration of the command.
+#If we aren't running as sudo, then we don't need this command, so it is set to ""
+[ $SUDO_USER ] && unsudo="sudo -u $SUDO_USER" || unsudo=""
 
 set -e
 set -o nounset
@@ -106,7 +105,7 @@ else
 fi
 
 cd $WRF_path
-$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers ./configure $compilers $flags 2>&1 | $unsudo tee ./configure.log
+$unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers $flags 2>&1 | $unsudo tee ./configure.log
 if ( $use_wrf_regex_fixes ); then
 	$unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf
 else
@@ -126,18 +125,18 @@ cd ../
 
 
 cd $WPS_path
-$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers ./configure $compilers $flags #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
+$unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers $flags #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
 echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
 echo "However, this script fixes those problems, so... No need to worry about it."
 if ( $use_wps_regex_fixes ); then
-	$unsudo perl -0777 -i -pe 's/ *(-f90=($\([^\(]*\))|[^ \t\n]*)|-cc=($\([^\(]*\))|[^ \t\n]*)*) *//igs' ./configure.wps
+	$unsudo perl -0777 -i -pe 's/[ \t]*(-f90=($\([^\(]*\))|[^ \t\n]*)|-cc=($\([^\(]*\))|[^ \t\n]*)*)[ \t]*//igs' ./configure.wps
 	$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.wps
 	$unsudo perl -0777 -i -pe 's/(WRF_LIB[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wps
 else
 	echo "Skipping WPS regex fixes."
 fi
-$unsudo NETCDF=$netcdf_prefix $compilers ./compile 2>&1 | $unsudo tee ./compile.log
-$unsudo NETCDF=$netcdf_prefix $compilers ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
+$unsudo `NETCDF=$netcdf_prefix $compilers` ./compile 2>&1 | $unsudo tee ./compile.log
+$unsudo `NETCDF=$netcdf_prefix $compilers` ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
 cd ../
 
 echo "Please confirm that all of the executables have been appropriately created in the WRFV$wrf_major_version and WPSV$wrf_major_version directories."
