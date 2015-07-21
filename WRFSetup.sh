@@ -1,6 +1,17 @@
 #!/bin/bash
 . variables
 fet=$force_extract_tars #for convenience
+if (( $(echo "$(gcc -dumpversion | cut -f "1,2" -d.) >= 4.9" | bc -l) )) && ( ! $use_ld ); then
+	echo "use_ld is set to false, but your version of gcc is $(gcc -dumpversion), which will likely cause problems if use_ld is false."
+	read -p "Would you like to set use_ld to true for this run? [Y/n]" yn
+	declare -l yn
+	if [ "$yn" != "n" ]; then
+		use_ld=true
+		echo "Changed use_ld to true for this run. Please change the value in 'variables' if you wish to avoid this prompt."
+	else
+		read -p "Leaving use_ld false. This will almost certainly cause errors. Press [Enter] to continue."
+	fi
+fi
 [ $use_ld ] && ld_flag="--with-gnu-ld" || ld_flag=""
 
 #In order to run the WRF and WPS configure and compile scripts as the user that called this script
@@ -23,9 +34,14 @@ fi
 set -e
 set -o nounset
 
-if [ "$SUDO_USER" != "" ]; then
-	apt-get install build-essential libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev
+if [ "$unsudo" != "" ]; then
+	apt-get install build-essential libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen gfortran
 fi
+
+#These next three commands rename the WRF files so that they don't have a capitalized tar component (otherwise the tar command fails)
+[ -e "WRFV$wrf_version.TAR.gz" ] && $unsudo mv WRFV$wrf_version.TAR.gz WRFV$wrf_version.tar.gz
+[ -e "WPSV$wrf_version.TAR.gz" ] && $unsudo mv WPSV$wrf_version.TAR.gz WPSV$wrf_version.tar.gz
+[ -e "WRFV$wrf_major_version-Chem-$wrf_version.TAR.gz" ] && $unsudo mv WRFV$wrf_major_version-Chem-$wrf_version.TAR.gz WRFV$wrf_major_version-Chem-$wrf_version.tar.gz
 
 #The [ ! -d "<path>" ] && <action> form only performs <action> if <path> does not exist or is not a directory
 $fet || [ ! -d "$hydra_path" ]		&& $unsudo tar zxvf hydra-$hydra_version.tar.gz || echo "Already extracted Hydra"
