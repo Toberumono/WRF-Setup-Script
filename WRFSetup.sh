@@ -23,6 +23,10 @@ fi
 set -e
 set -o nounset
 
+if [ "$SUDO_USER" != "" ]; then
+	apt-get install build-essential libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev
+fi
+
 #The [ ! -d "<path>" ] && <action> form only performs <action> if <path> does not exist or is not a directory
 $fet || [ ! -d "$hydra_path" ]		&& $unsudo tar zxvf hydra-$hydra_version.tar.gz || echo "Already extracted Hydra"
 $fet || [ ! -d "$mpich_path" ]		&& $unsudo tar zxvf mpich-$mpich_version.tar.gz || echo "Already extracted MPICH"
@@ -103,7 +107,7 @@ if (! $lazy_recompile) || [ ! -e "$netcdf_prefix/include/netcdf.inc" ]; then
 	$unsudo $compilers ./configure --enable-doxygen $ld_flag --prefix=$netcdf_prefix $flags 2>&1 | $unsudo tee ./configure.log
 	$unsudo $compilers make check && $compilers make install 2>&1 | $unsudo tee ./make.log
 	if [! -e "$netcdf_prefix/lib/libnetcdff.a"]; then
-		echo "Failed to build NetCDF.  Please check configure.log and/or make.log in $netcdf_fortran_path."
+		echo "Failed to build NetCDF-Fortran.  Please check configure.log and/or make.log in $netcdf_fortran_path."
 		kill -INT $$
 	fi
 	cd ../
