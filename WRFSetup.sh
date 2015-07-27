@@ -25,11 +25,11 @@ set -o nounset
 #This command installs all of the required libraries.
 installation="build-essential $compilers git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 if [ "$unsudo" != "" ]; then
-	if [ "$(which apt-get)" != "" ]; then
+	if [ "$(which apt-get)" != "" ]; then #apt-get was detected.
 		apt-get install $installation
-	elif [ "$(which yum)" != "" ]; then
+	elif [ "$(which yum)" != "" ]; then #yum was detected.
 		yum install $installation
-	elif [ "$(which brew)" != "" ]; then #We are running on Mac OSX and will be using Homebrew.  THIS IS EXPERIMENTAL.
+	elif [ "$(which brew)" != "" ]; then #Homebrew (or potentially linuxbrew) was detecteted.  USING BREW IS EXPERIMENTAL.
 		$unsudo brew install $installation
 	else
 		echo "Error: Unable to find apt-get or yum."

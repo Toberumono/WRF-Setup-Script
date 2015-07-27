@@ -7,7 +7,7 @@ compilers="gcc gfortran"
 
 #Toggles for optional components
 keep_namelists=true #WRF sometimes deletes namelist files on recompile.  This backs them up. [Default: true]
-use_wrf_regex_fixes=false #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
+use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
 use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
 force_extract_tars=false #If true, the script always extracts every tarball, regardless if they already have been extracted [Default: false]
 lazy_recompile=true #Don't recompile already compiled libs [Default: true]
