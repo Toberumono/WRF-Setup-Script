@@ -1,0 +1,47 @@
+#Change these variables to match your versions
+mpich_version="3.1.4"
+hydra_version=$mpich_version #Hydra and mpich should have the same version.
+hdf5_version="1.9.222"
+netcdf_version="4.3.3.1"
+netcdf_fortran_version="4.4.2"
+wrf_major_version="3"
+wrf_minor_version="7"
+
+#Toggles for optional components
+keep_namelists=true #WRF sometimes deletes namelist files on recompile.  This backs them up. [Default: true]
+use_ld=false #For gcc version 4.9.x, set this to true [Default: false]
+use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
+use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
+skip_mpich=false #If true, this script will /not/ build MPICH or Hydra [Default: false]
+force_extract_tars=false #If true, the script always extracts every tarball, regardless if they already have been extracted [Default: false]
+lazy_recompile=true #Don't recompile already compiled libs [Default: true]
+
+#Paths
+hydra_prefix="/usr/local/hydra"
+mpich_prefix="/usr/local/mpich"
+hdf5_prefix="/usr/local/hdf5"
+netcdf_prefix="/usr/local/netcdf"
+
+#Don't change any variables below this line unless absolutely necessary
+wrf_version=$wrf_major_version.$wrf_minor_version
+compilers=`CC=mpicc FC=mpif90`
+
+#Untar'd paths
+hydra_path="hydra-$hydra_version"
+mpich_path="mpich-$mpich_version"
+hdf5_path="hdf5-$hdf5_version"
+netcdf_path="netcdf-$netcdf_version"
+netcdf_fortran_path="netcdf-fortran-$netcdf_fortran_version"
+WRF_path="WRFV$wrf_major_version"
+WRF_Chem_path="$WRF_path/chem"
+WPS_path="WPS"
+
+
+#DO NOT EDIT BELOW THIS LINE
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"

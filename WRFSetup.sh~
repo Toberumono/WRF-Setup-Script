@@ -15,7 +15,7 @@ fi
 [ $use_ld ] && ld_flag="--with-gnu-ld" || ld_flag=""
 
 #In order to run the WRF and WPS configure and compile scripts as the user that called this script
-#(so that the files can be edited without sudo) when this script is called with sudo, we have to use sudo to
+#(so that the files can be edited without sudo) when this script is called, we have to use sudo to
 #specifically switch back to that user for the duration of the command.
 #If we aren't running as sudo, then we don't need this command, so it is set to ""
 [ $SUDO_USER ] && unsudo="sudo -u $SUDO_USER" || unsudo=""

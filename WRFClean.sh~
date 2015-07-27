@@ -1,0 +1,109 @@
+#!/bin/bash
+. variables
+print_help() {
+	echo "This utility cleans WRF and WPS installations and (optionally) backs up their namelist files."
+	echo "Usage: ./WRFClean.sh [([wrf] [wps] [-a]|-h|--help)] (in any order, case insensitive)"
+	echo "wrf -> clean WRF"
+	echo "wps -> clean WPS"
+	echo "-a -> appends -a to the clean calls"
+	echo "-h -> display this help text"
+	echo "--help -> -h"
+	echo "If wrf or wps are provided, it will only clean the ones that are provided"
+	echo "\t(so, './WRFClean.sh' is equivalent to './WRFClean.sh wrf wps')"
+	
+}
+fet=$force_extract_tars #for convenience
+[ $use_ld ] && ld_flag="--with-gnu-ld" || ld_flag=""
+
+#In order to run the WRF and WPS configure and compile scripts as the user that called this script
+#(so that the files can be edited without sudo) when this script is called, we have to use sudo to
+#specifically switch back to that user for the duration of the command.
+#If we aren't running as sudo, then we don't need this command, so it is set to ""
+[ $SUDO_USER ] && unsudo="sudo -u $SUDO_USER" || unsudo=""
+
+clean_wrf=false
+clean_wps=false
+use_a=false
+
+for var in "$@"
+do
+	declare -l var
+	if [ "$var" == "-a" ]; then
+		use_a=true
+	elif [ "$var" == "wrf" ]; then
+		clean_wrf=true
+	elif [ "$var" == "wps" ]; then
+		clean_wps=true
+	else
+		print_help()
+		kill -INT $$
+	fi
+done
+text="wrf and wps installations"
+if ( $clean_wrf ); then
+	text="wrf"
+	if ( $clean_wps ); then
+		text=$text" and wps installations"
+	else
+		text=$text" installation"
+	fi
+elif ( $clean_wps); then
+	text="wps installation"
+fi
+if ( $use_a ); then
+	text=$text" with ./clean -a"
+else
+	text=$text"with ./clean"
+fi
+
+read -p "This script will clean your "$text".  Press [Enter] to continue, [q] to quit. " cont
+declare -l cont
+if [ "$cont" == "q" ]; then
+	kill -INT $$
+fi
+
+if ( ! $keep_namelists ); then
+	read -p "keep_namelists in 'variables' is currently set to false. If you proceed, you will loose any existing namelist files. Is this okay? [y/N] " yn
+	declare -l yn
+	if [ "$yn" != "y" ]; then
+		keep_namelists=true
+		echo "Changed keep_namelists to true for this run. Please change the value in 'variables' if you wish to avoid this prompt."
+	else
+		read -p "Leaving keep_namelists false. Some existing namelists may be deleted. Press [Enter] to continue."
+	fi
+fi
+
+set -e
+set -o nounset
+
+if ( $clean_wrf ); then
+	cd $WRF_path
+	if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
+		$unsudo cp "./run/namelist.input" "namelist.input.back"
+	fi
+	if ( $use_a ); then
+		$unsudo ./clean -a
+	else
+		$unsudo ./clean
+	fi
+	if ( $keep_namelists ) && [ -e "namelist.input.back" ]; then
+		$unsudo mv "namelist.input.back" "./run/namelist.input"
+	fi
+	cd ../
+fi
+
+if ( $clean_wps ); then
+	cd $WPS_path
+	if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
+		$unsudo cp "./namelist.wps" "namelist.wps.back"
+	fi
+	if ( $use_a ); then
+		$unsudo ./clean -a
+	else
+		$unsudo ./clean
+	fi
+	if ( $keep_namelists ) && [ -e "namelist.wps.back" ]; then
+		$unsudo mv "namelist.wps.back" "./namelist.wps"
+	fi
+	cd ../
+fi
