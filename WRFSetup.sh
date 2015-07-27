@@ -96,7 +96,7 @@ cd ../ #Finished WRF
 cd $WPS_path #Starting WPS
 
 #Back up namelist.wps
-if ( $keep_namelists ) && [ -e "./run/namelist.wps" ]; then
+if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
 	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
 	echo "Backed up namelist.wps."
 elif ( $keep_namelists ); then
