@@ -97,7 +97,7 @@ cd $WPS_path #Starting WPS
 
 #Back up namelist.wps
 if ( $keep_namelists ) && [ -e "./run/namelist.wps" ]; then
-	$unsudo cp "./run/namelist.wps" "$DIR/namelist.wps.back"
+	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
 	echo "Backed up namelist.wps."
 elif ( $keep_namelists ); then
 	echo "No namelist.wps to back up."
@@ -121,7 +121,7 @@ $unsudo ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
 
 #Restore namelist.wps
 if ( $keep_namelists ) && [ -e "$DIR/namelist.wps.back" ]; then
-	$unsudo mv "$DIR/namelist.wps.back" "./run/namelist.wps"
+	$unsudo mv "$DIR/namelist.wps.back" "./namelist.wps"
 	echo "Restored namelist.wps."
 elif ( $keep_namelists ); then
 	echo "No namelist.wps to restore."
