@@ -37,13 +37,13 @@ set -o nounset
 #This command installs all of the required libraries.
 if [ "$unsudo" != "" ]; then
 	installation="build-essential git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen gfortran libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
-	test= which "apt-get"
+	test="$(which apt-get)"
 	if [ "$test" != "" ]; then
 		apt-get install $installation
 	else
 		test= which "yum"
 		if [ "$test" != "" ]; then
-			yum install "$installation"
+			yum install $installation
 		else
 			echo "Error: Unable to find apt-get or yum."
 			read -p "Please install $installation before continuing."
@@ -65,7 +65,7 @@ cd $WPS_path
 if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
 	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
 fi
-$unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF="/usr" $compilers` ./configure $compilers $flags #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
+$unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF="/usr" $compilers` ./configure $compilers #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
 echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
 echo "However, this script fixes those problems, so... No need to worry about it."
 if ( $use_wps_regex_fixes ); then
