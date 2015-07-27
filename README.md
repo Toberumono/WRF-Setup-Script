@@ -38,7 +38,7 @@
 
 ### A few notes
 1. This script **requires** that you have the tarballs for WRF and WPS in the same directory as the script.
-2. Make sure you do **not** have *any* spaces in the path to your WRF directory.  *This is **essential** to successful compilation of WRF and WPS.*
+2. Make sure you do **not** have *any* spaces in the path to your WRF directory.  *This is ***essential*** to successful compilation of WRF and WPS.*
 3. You will need sudo privileges the first time you run this script, unless you previously installed all of the required software (which is unlikely).
 
 ### Preparation
