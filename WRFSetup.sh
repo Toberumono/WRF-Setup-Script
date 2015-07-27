@@ -36,7 +36,7 @@ set -o nounset
 
 #This command installs all of the required libraries.
 if [ "$unsudo" != "" ]; then
-	installation="build-essential libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen gfortran libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
+	installation="build-essential git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen gfortran libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 	test= which "apt-get"
 	if [ "$test" != "" ]; then
 		apt-get install $installation
