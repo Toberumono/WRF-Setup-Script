@@ -23,20 +23,19 @@ set -e
 set -o nounset
 
 #This command installs all of the required libraries.
+installation="build-essential $compilers git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 if [ "$unsudo" != "" ]; then
-	installation="build-essential git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen gfortran libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
-	test="$(which apt-get)"
-	if [ "$test" != "" ]; then
+	if [ "$(which apt-get)" != "" ]; then
 		apt-get install $installation
-	else
-		test= which "yum"
-		if [ "$test" != "" ]; then
+	elif [ "$(which yum)" != "" ]; then
 			yum install $installation
-		else
-			echo "Error: Unable to find apt-get or yum."
-			read -p "Please install $installation before continuing."
-		fi
+	else
+		echo "Error: Unable to find apt-get or yum."
+		read -p "Please install $installation before continuing."
 	fi
+elif [ "$(which wget)" == "" ]; then
+	echo "Error: Support software failed to install."
+	read -p "Please install $installation before continuing."
 fi
 
 #These next three commands rename the WRF files so that they don't have a capitalized tar component (otherwise the tar command fails)
@@ -55,19 +54,19 @@ if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
 fi
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 export NETCDF="$netcdf_prefix"
-$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers ./configure $compilers 2>&1 | $unsudo tee ./configure.log
+$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers ./configure $mpich_compilers 2>&1 | $unsudo tee ./configure.log
 if ( $use_wrf_regex_fixes ); then
 	$unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf
 else
 	echo "Skipping WRF regex fixes."
 fi
-$unsudo $compilers ./compile wrf 2>&1 | $unsudo tee ./compile_wrf.log
-$unsudo $compilers ./compile
+$unsudo $mpich_compilers ./compile wrf 2>&1 | $unsudo tee ./compile_wrf.log
+$unsudo $mpich_compilers ./compile
 echo "Please enter the test case you would like to run (this can include the '-j n' part) or none [Default: none]:"
 read test_case
 declare -l test_case
 if [ $(echo ${#test_case}) -gt 4 ] && [ "$test_case" != "" -a "$test_case" != "none" ]; then
-	$unsudo $compilers ./compile "$test_case" 2>&1 | $unsudo tee ./compile_test_case.log
+	$unsudo $mpich_compilers ./compile "$test_case" 2>&1 | $unsudo tee ./compile_test_case.log
 else
 	echo "Skipping compiling a test case."
 fi
@@ -80,7 +79,7 @@ cd $WPS_path
 if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
 	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
 fi
-$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF="/usr" $compilers ./configure $compilers #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
+$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF="/usr" $mpich_compilers ./configure $mpich_compilers #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
 echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
 echo "However, this script fixes those problems, so... No need to worry about it."
 if ( $use_wps_regex_fixes ); then
@@ -93,8 +92,8 @@ if ( $use_wps_regex_fixes ); then
 else
 	echo "Skipping WPS regex fixes."
 fi
-$unsudo NETCDF=$netcdf_prefix $compilers ./compile 2>&1 | $unsudo tee ./compile.log
-$unsudo NETCDF=$netcdf_prefix $compilers ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
+$unsudo NETCDF=$netcdf_prefix $mpich_compilers ./compile 2>&1 | $unsudo tee ./compile.log
+$unsudo NETCDF=$netcdf_prefix $mpich_compilers ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
 if ( $keep_namelists ) && [ -e "$DIR/namelist.wps.back" ]; then
 	$unsudo mv "$DIR/namelist.wps.back" "./namelist.wps"
 fi

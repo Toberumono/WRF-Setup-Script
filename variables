@@ -2,6 +2,9 @@
 wrf_major_version="3"
 wrf_minor_version="7"
 
+#Change this if you don't want to install gcc/gfortran
+compilers="gcc gfortran"
+
 #Toggles for optional components
 keep_namelists=true #WRF sometimes deletes namelist files on recompile.  This backs them up. [Default: true]
 use_wrf_regex_fixes=false #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
@@ -14,7 +17,7 @@ netcdf_prefix="/usr"
 
 #Don't change any variables below this line unless absolutely necessary
 wrf_version=$wrf_major_version.$wrf_minor_version
-compilers=`CC=mpicc FC=mpif90`
+mpich_compilers=`CC=mpicc FC=mpif90`
 
 #Untar'd paths
 WRF_path="WRFV$wrf_major_version"
