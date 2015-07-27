@@ -1,18 +1,6 @@
 #!/bin/bash
 . variables
 fet=$force_extract_tars #for convenience
-if (( $(echo "$(gcc -dumpversion | cut -f "1,2" -d.) >= 4.9" | bc -l) )) && ( ! $use_ld ); then
-	echo "use_ld is set to false, but your version of gcc is $(gcc -dumpversion), which will likely cause problems if use_ld is false."
-	read -p "Would you like to set use_ld to true for this run? [Y/n]" yn
-	declare -l yn
-	if [ "$yn" != "n" ]; then
-		use_ld=true
-		echo "Changed use_ld to true for this run. Please change the value in 'variables' if you wish to avoid this prompt."
-	else
-		read -p "Leaving use_ld false. This will almost certainly cause errors. Press [Enter] to continue."
-	fi
-fi
-[ $use_ld ] && ld_flag="--with-gnu-ld" || ld_flag=""
 
 #In order to run the WRF and WPS configure and compile scripts as the user that called this script
 #(so that the files can be edited without sudo) when this script is called with sudo, we have to use sudo to
@@ -67,7 +55,7 @@ if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
 fi
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 export NETCDF="$netcdf_prefix"
-$unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers 2>&1 | $unsudo tee ./configure.log
+$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers ./configure $compilers 2>&1 | $unsudo tee ./configure.log
 if ( $use_wrf_regex_fixes ); then
 	$unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf
 else
@@ -92,7 +80,7 @@ cd $WPS_path
 if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
 	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
 fi
-$unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF="/usr" $compilers` ./configure $compilers #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
+$unsudo WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF="/usr" $compilers ./configure $compilers #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
 echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
 echo "However, this script fixes those problems, so... No need to worry about it."
 if ( $use_wps_regex_fixes ); then
@@ -105,8 +93,8 @@ if ( $use_wps_regex_fixes ); then
 else
 	echo "Skipping WPS regex fixes."
 fi
-$unsudo `NETCDF=$netcdf_prefix $compilers` ./compile 2>&1 | $unsudo tee ./compile.log
-$unsudo `NETCDF=$netcdf_prefix $compilers` ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
+$unsudo NETCDF=$netcdf_prefix $compilers ./compile 2>&1 | $unsudo tee ./compile.log
+$unsudo NETCDF=$netcdf_prefix $compilers ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
 if ( $keep_namelists ) && [ -e "$DIR/namelist.wps.back" ]; then
 	$unsudo mv "$DIR/namelist.wps.back" "./namelist.wps"
 fi
