@@ -1,26 +1,18 @@
 #Change these variables to match your versions
-mpich_version="3.1.4"
-hydra_version=$mpich_version #Hydra and mpich should have the same version.
-hdf5_version="1.9.222"
-netcdf_version="4.3.3.1"
-netcdf_fortran_version="4.4.2"
 wrf_major_version="3"
 wrf_minor_version="7"
 
 #Toggles for optional components
 keep_namelists=true #WRF sometimes deletes namelist files on recompile.  This backs them up. [Default: true]
 use_ld=false #For gcc version 4.9.x, set this to true [Default: false]
-use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
-use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
+use_wrf_regex_fixes=false #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
+use_wps_regex_fixes=false #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
 skip_mpich=false #If true, this script will /not/ build MPICH or Hydra [Default: false]
 force_extract_tars=false #If true, the script always extracts every tarball, regardless if they already have been extracted [Default: false]
 lazy_recompile=true #Don't recompile already compiled libs [Default: true]
 
 #Paths
-hydra_prefix="/usr/local/hydra"
-mpich_prefix="/usr/local/mpich"
-hdf5_prefix="/usr/local/hdf5"
-netcdf_prefix="/usr/local/netcdf"
+netcdf_prefix="/usr"
 
 #Don't change any variables below this line unless absolutely necessary
 wrf_version=$wrf_major_version.$wrf_minor_version

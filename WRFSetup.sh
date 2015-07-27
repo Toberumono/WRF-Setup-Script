@@ -61,6 +61,33 @@ $fet || [ ! -d "$WRF_path" ]		&& $unsudo tar zxvf WRFV$wrf_version.tar.gz || ech
 $fet || [ ! -d "$WRF_Chem_path" ]	&& $unsudo tar zxvf WRFV$wrf_major_version-Chem-$wrf_version.tar.gz -C $WRF_path || echo "Already extracted WRF-Chem"
 $fet || [ ! -d "$WPS_path" ]		&& $unsudo tar zxvf WPSV$wrf_version.tar.gz || echo "Already extracted WPS"
 
+cd $WRF_path
+if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
+	$unsudo cp "./run/namelist.input" "$DIR/namelist.input.back"
+fi
+export WRFIO_NCD_LARGE_FILE_SUPPORT=1
+export NETCDF="$netcdf_prefix"
+$unsudo `WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $compilers` ./configure $compilers 2>&1 | $unsudo tee ./configure.log
+if ( $use_wrf_regex_fixes ); then
+	$unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf
+else
+	echo "Skipping WRF regex fixes."
+fi
+$unsudo $compilers ./compile wrf 2>&1 | $unsudo tee ./compile_wrf.log
+$unsudo $compilers ./compile
+echo "Please enter the test case you would like to run (this can include the '-j n' part) or none [Default: none]:"
+read test_case
+declare -l test_case
+if [ $(echo ${#test_case}) -gt 4 ] && [ "$test_case" != "" -a "$test_case" != "none" ]; then
+	$unsudo $compilers ./compile "$test_case" 2>&1 | $unsudo tee ./compile_test_case.log
+else
+	echo "Skipping compiling a test case."
+fi
+if ( $keep_namelists ) && [ -e "$DIR/namelist.input.back" ]; then
+	$unsudo mv "$DIR/namelist.input.back" "./run/namelist.input"
+fi
+cd ../
+
 cd $WPS_path
 if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
 	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
