@@ -30,6 +30,7 @@ if [ "$unsudo" != "" ]; then
 	elif [ "$(which yum)" != "" ]; then #yum was detected.
 		yum install $installation
 	elif [ "$(which brew)" != "" ]; then #Homebrew (or potentially linuxbrew) was detecteted.  USING BREW IS EXPERIMENTAL.
+		$unsudo brew tap homebrew/science
 		$unsudo brew install $installation
 	else
 		echo "Error: Unable to find apt-get or yum."
