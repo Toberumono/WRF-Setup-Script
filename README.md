@@ -13,7 +13,7 @@ This is a pair of scripts that automate the process of configuring a computer to
 	1. Cleans WRF and WPS installations.
 	2. Backs up namelist.input and namelist.wps files such that the WRFSetup.sh script can restore them.
 
-## <a name="wdtsnd"></a>What does this script not do?
+## <a name="wdtsnd"></a>What do these scripts not do?
 
 + WRFSetup.sh
 	1. This script does *not* download the tarballs for WRF, WPS, or the GEOGRID data - that would require implicit license agreements or something, and, besides, you should really know what you're downloading.  It's safer that way.

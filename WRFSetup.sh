@@ -31,7 +31,7 @@ if [ "$unsudo" != "" ]; then
 		yum install $installation
 	elif [ "$(which brew)" != "" ]; then #Homebrew (or potentially linuxbrew) was detecteted.  USING BREW IS EXPERIMENTAL.
 		$unsudo brew tap homebrew/science
-		$unsudo brew install $installation
+		$unsudo brew install "git wget cairo libpng szip lzlib pixman m4 doxygen mpich2 tcsh hdf5 netcdf ncl"
 	else
 		echo "Error: Unable to find apt-get or yum."
 		read -p "Please install $installation before continuing."
