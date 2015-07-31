@@ -31,7 +31,16 @@ if [ "$unsudo" != "" ]; then
 		yum install $installation
 	elif [ "$(which brew)" != "" ]; then #Homebrew (or potentially linuxbrew) was detecteted.  USING BREW IS EXPERIMENTAL.
 		$unsudo brew tap homebrew/science
-		$unsudo brew install "git wget cairo libpng szip lzlib pixman m4 doxygen mpich2 tcsh hdf5 netcdf ncl"
+		installation="wget cairo libpng szip lzlib pixman doxygen mpich2 tcsh hdf5 netcdf ncl"
+		if [ "$(which m4)" == "" ]; then
+			brew tap homebrew/dupes
+			installation="m4 "$installation
+		fi
+		if [ "$(which git)" == "" ]; then
+			installation="git "$installation
+		fi
+		$unsudo brew install $installation
+		$unsudo netcdf_prefix="$(brew --prefix)"
 	else
 		echo "Error: Unable to find apt-get or yum."
 		read -p "Please install $installation before continuing."
@@ -39,6 +48,7 @@ if [ "$unsudo" != "" ]; then
 elif [ "$(which wget)" == "" ]; then
 	echo "Error: Support software failed to install."
 	read -p "Please install $installation before continuing."
+	kill -INT $$
 fi
 
 #These next three commands rename the WRF files so that they don't have a capitalized tar component (otherwise the tar command fails)

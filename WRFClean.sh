@@ -25,7 +25,7 @@ use_a=false
 
 for var in "$@"
 do
-	declare -l var
+	var=$(echo "$var" | tr '[:upper:]' '[:lower:]')
 	if [ "$var" == "-a" ]; then
 		use_a=true
 	elif [ "$var" == "wrf" ]; then
@@ -58,14 +58,14 @@ else
 fi
 
 read -p "This script will clean your $text.  Press [Enter] to continue, [q] to quit. " cont
-declare -l cont
+cont=$(echo "$cont" | tr '[:upper:]' '[:lower:]')
 if [ "$cont" == "q" ]; then
 	kill -INT $$
 fi
 
 if ( ! $keep_namelists ); then
 	read -p "keep_namelists in 'variables' is currently set to false. If you proceed, you will loose any existing namelist files. Is this okay? [y/N] " yn
-	declare -l yn
+	yn=$(echo "$yn" | tr '[:upper:]' '[:lower:]')
 	if [ "$yn" != "y" ]; then
 		keep_namelists=true
 		echo "Changed keep_namelists to true for this run. Please change the value in 'variables' if you wish to avoid this prompt."
