@@ -17,8 +17,8 @@ This is a pair of scripts that automate the process of configuring a computer to
 
 + WRFSetup.sh
 	1. Does *not* download the tarballs for WRF, WPS, or the GEOGRID data - that would require implicit license agreements or something, and, besides, you should really know what you're downloading.  It's safer that way.
-	2. Does not run on Windows.  It runs on Linux and OSX *only*, and assumes the gcc/gfortran compilers.  If you want to use a different compiler, change the compiler variable in the 'variables' file, but do so at your own risk.
-	3. *Does not* run WRF.  That's a whole different process.  However, my WRF Runner script, available at [https://github.com/toberumono/WRF-Runner](https://github.com/toberumono/WRF-Runner) automates running WRF.
+	2. Does *not* run on Windows.  It runs on Linux and OSX *only*, and assumes the gcc/gfortran compilers.  If you want to use a different compiler, change the compiler variable in the 'variables' file, but do so at your own risk.
+	3. Does *not* run WRF.  That's a whole different process.  However, my WRF Runner script, available at [https://github.com/toberumono/WRF-Runner](https://github.com/toberumono/WRF-Runner) automates running WRF.
 
 + WRFClean.sh
 	1. This script does *not* uninstall the programs that were installed by WRFSetup.sh - that is too risky as some of them were almost certainly already installed on the system prior to running WRFSetup.sh
