@@ -40,9 +40,9 @@ if [ "$unsudo" != "" ]; then
 			installation="git "$installation
 		fi
 		$unsudo brew install $installation
-		$unsudo netcdf_prefix="$(brew --prefix)"
+		netcdf_prefix="$(brew --prefix)"
 	else
-		echo "Error: Unable to find apt-get or yum."
+		echo "Error: Unable to find apt-get, yum, or Homebrew/Linuxbrew."
 		read -p "Please install $installation before continuing."
 	fi
 elif [ "$(which wget)" == "" ]; then
