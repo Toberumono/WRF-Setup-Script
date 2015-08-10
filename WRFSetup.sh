@@ -26,14 +26,15 @@ set -o nounset
 installation="build-essential $compilers git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 if [ "$(which brew)" != "" ]; then #Homebrew or Linuxbrew was detecteted.
 	$unsudo brew tap homebrew/science
-	installation="wget cairo libpng szip lzlib pixman doxygen mpich2 tcsh hdf5 netcdf ncl"
+	$unsudo brew tap homebrew/dupes
+	installation="wget ncurses cairo libpng szip lzlib pixman doxygen mpich2 tcsh hdf5 ncl"
 	if [ "$(which m4)" == "" ]; then
-		brew tap homebrew/dupes
 		installation="m4 "$installation
 	fi
 	if [ "$(which git)" == "" ]; then
 		installation="git "$installation
 	fi
+	$unsudo brew install "netcdf" "--with-fortran"
 	$unsudo brew install $installation
 elif [ "$unsudo" != "" ]; then
 	if [ "$(which apt-get)" != "" ]; then #apt-get was detected.
