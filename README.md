@@ -53,4 +53,5 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 ### Running the script
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
 2. Run `sudo ./WRFSetup.sh` if you are not sure if all of the required software is installed and you do not have [Homebrew](http://brew.sh) or [Linuxbrew](https://github.com/Homebrew/linuxbrew) installed.  Otherwise, run `./WRFSetup.sh` (sudo is not required to configure or compile WRF or WPS).
-	+ Note: Depending on how many libraries need to be installed, this could take a *long* time.
+	+ Depending on how many libraries need to be installed, this could take a *long* time.
+	+ There may be a bunch of warnings about things already being tapped or installed.  This is normal - it just means that 'brew has detected that some of the requirements were already installed.
