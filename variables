@@ -4,7 +4,7 @@ wrf_minor_version="7"
 
 #These set the compilers to be used when configuring WRF and WPS.  Make sure to enclose these in backticks (`) instead of quotes (")
 compilers="gcc gfortran" #Determines which compilers should be installed (if any), you can change this to set which compilers are used. [Default: "gcc gfortran"]
-mpich_compilers=`CC=mpicc FC=mpif90` #This sets the compilers to be used when building with MPICH. [Default: `CC=mpicc FC=mpif90`]
+mpich_compilers="CC=mpicc FC=mpif90" #This sets the compilers to be used when building with MPICH. [Default: "CC=mpicc FC=mpif90"]
 
 #Toggles for optional components
 keep_namelists=true #WRF sometimes deletes namelist files during recompile or clean operations.  This backs them up and restores them. [Default: true]
