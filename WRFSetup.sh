@@ -60,11 +60,22 @@ fi
 $fet || [ ! -d "$wrf_path" ]		&& $unsudo tar zxvf WRFV$wrf_version.tar.gz || echo "Already extracted WRF"
 $fet || [ ! -d "$wrf_chem_path" ]	&& $unsudo tar zxvf WRFV$wrf_major_version-Chem-$wrf_version.tar.gz -C $wrf_path || echo "Already extracted WRF-Chem"
 $fet || [ ! -d "$wps_path" ]		&& $unsudo tar zxvf WPSV$wrf_version.tar.gz || echo "Already extracted WPS"
+if [ -e "geog_complete.tar.bz2" ]; then
+	mkdir -p "$geog_path"
+	$fet || [ ! -d "$geog_path" ]		&& $unsudo tar xjvf geog_complete.tar.bz2 -C "$geog_path" || echo "Already extracted GEOG"
+elif [ -e "geog_minimum.tar.bz2" ]; then
+	mkdir -p "$geog_path"
+	$fet || [ ! -d "$geog_path" ]		&& $unsudo tar xjvf geog_minimum.tar.bz2 -C "$geog_path" || echo "Already extracted GEOG"
+fi
 
 #Export variables for when this script is not run with sudo.
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 export NETCDF=$netcdf_prefix
-export $mpich_compilers
+if ( $with_mpi ); then
+	export $mpich_compilers
+else
+	export $compilers
+fi
 
 cd $wrf_path #Starting WRF
 
@@ -141,4 +152,4 @@ fi
 cd ../ #Finished WPS
 
 echo "Please confirm that all of the executables have been appropriately created in the WRFV$wrf_major_version and WPS directories."
-echo "You will still need to extract your Geogrid data and get GFS data relevant to the times you are interested in simulating."
+echo "You will still need to get boundary data for your simulations.  If you want an automated script to do this, see my WRF-Runner project at github.com/Toberumono/WRF-Runner"
