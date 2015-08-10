@@ -57,20 +57,20 @@ fi
 [ -e "WRFV$wrf_major_version-Chem-$wrf_version.TAR.gz" ] && $unsudo mv WRFV$wrf_major_version-Chem-$wrf_version.TAR.gz WRFV$wrf_major_version-Chem-$wrf_version.tar.gz
 
 #The [ ! -d "<path>" ] && <action> form only performs <action> if <path> does not exist or is not a directory
-$fet || [ ! -d "$WRF_path" ]		&& $unsudo tar zxvf WRFV$wrf_version.tar.gz || echo "Already extracted WRF"
-$fet || [ ! -d "$WRF_Chem_path" ]	&& $unsudo tar zxvf WRFV$wrf_major_version-Chem-$wrf_version.tar.gz -C $WRF_path || echo "Already extracted WRF-Chem"
-$fet || [ ! -d "$WPS_path" ]		&& $unsudo tar zxvf WPSV$wrf_version.tar.gz || echo "Already extracted WPS"
+$fet || [ ! -d "$wrf_path" ]		&& $unsudo tar zxvf WRFV$wrf_version.tar.gz || echo "Already extracted WRF"
+$fet || [ ! -d "$wrf_chem_path" ]	&& $unsudo tar zxvf WRFV$wrf_major_version-Chem-$wrf_version.tar.gz -C $wrf_path || echo "Already extracted WRF-Chem"
+$fet || [ ! -d "$wps_path" ]		&& $unsudo tar zxvf WPSV$wrf_version.tar.gz || echo "Already extracted WPS"
 
 #Export variables for when this script is not run with sudo.
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 export NETCDF=$netcdf_prefix
 export $mpich_compilers
 
-cd $WRF_path #Starting WRF
+cd $wrf_path #Starting WRF
 
 #Back up namelist.input
 if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
-	$unsudo cp "./run/namelist.input" "$DIR/namelist.input.back"
+	$unsudo cp "./run/namelist.input" "$backup_dir/namelist.input.back"
 	echo "Backed up namelist.input."
 elif ( $keep_namelists ); then
 	echo "No namelist.input to back up."
@@ -95,8 +95,8 @@ else
 fi
 
 #Restore namelist.input.
-if ( $keep_namelists ) && [ -e "$DIR/namelist.input.back" ]; then
-	$unsudo mv "$DIR/namelist.input.back" "./run/namelist.input"
+if ( $keep_namelists ) && [ -e "$backup_dir/namelist.input.back" ]; then
+	$unsudo mv "$backup_dir/namelist.input.back" "./run/namelist.input"
 	echo "Restored namelist.input."
 elif ( $keep_namelists ); then
 	echo "No namelist.input to restore."
@@ -104,11 +104,11 @@ fi
 
 cd ../ #Finished WRF
 
-cd $WPS_path #Starting WPS
+cd $wps_path #Starting WPS
 
 #Back up namelist.wps
 if ( $keep_namelists ) && [ -e "./namelist.wps" ]; then
-	$unsudo cp "./namelist.wps" "$DIR/namelist.wps.back"
+	$unsudo cp "./namelist.wps" "$backup_dir/namelist.wps.back"
 	echo "Backed up namelist.wps."
 elif ( $keep_namelists ); then
 	echo "No namelist.wps to back up."
@@ -131,8 +131,8 @@ $unsudo ./compile 2>&1 | $unsudo tee ./compile.log
 $unsudo ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
 
 #Restore namelist.wps
-if ( $keep_namelists ) && [ -e "$DIR/namelist.wps.back" ]; then
-	$unsudo mv "$DIR/namelist.wps.back" "./namelist.wps"
+if ( $keep_namelists ) && [ -e "$backup_dir/namelist.wps.back" ]; then
+	$unsudo mv "$backup_dir/namelist.wps.back" "./namelist.wps"
 	echo "Restored namelist.wps."
 elif ( $keep_namelists ); then
 	echo "No namelist.wps to restore."
