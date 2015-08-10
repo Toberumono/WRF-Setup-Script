@@ -17,9 +17,8 @@ print_help() {
 #(so that the files can be edited without sudo) when this script is called, we have to use sudo to
 #specifically switch back to that user for the duration of the command.
 #If we aren't running as sudo, then we don't need this command, so it is set to ""
-unsudo=""
-if ( $SUDO_USER ); then
-	unsudo="sudo -u $SUDO_USER"
+[ $SUDO_USER ] && unsudo="sudo -u $SUDO_USER" || unsudo=""
+if [ $unsudo != "" ]; then
 	echo "This script should NOT be run as sudo."
 	echo "Therefore, each command will call $unsudo first"
 fi
@@ -84,7 +83,7 @@ set -e
 set -o nounset
 
 if ( $clean_wrf ); then
-	cd $WRF_path
+	cd $wrf_path
 	if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
 		$unsudo cp "./run/namelist.input" "$backup_dir/namelist.input.back"
 	fi
@@ -97,7 +96,7 @@ if ( $clean_wrf ); then
 fi
 
 if ( $clean_wps ); then
-	cd $WPS_path
+	cd $wps_path
 	if [ $keep_namelists -a -e "./namelist.wps" ]; then
 		$unsudo cp "./namelist.wps" "$backup_dir/namelist.wps.back"
 	fi
