@@ -36,7 +36,7 @@ if [ "$(which brew)" != "" ]; then #Homebrew or Linuxbrew was detecteted.
 	fi
 	$unsudo brew install $installation
 elif [ "$unsudo" != "" ]; then
-	elif [ "$(which apt-get)" != "" ]; then #apt-get was detected.
+	if [ "$(which apt-get)" != "" ]; then #apt-get was detected.
 		apt-get install $installation
 	elif [ "$(which yum)" != "" ]; then #yum was detected.
 		yum install $installation
