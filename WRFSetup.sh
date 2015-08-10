@@ -40,7 +40,6 @@ if [ "$unsudo" != "" ]; then
 			installation="git "$installation
 		fi
 		$unsudo brew install $installation
-		netcdf_prefix="$(brew --prefix)"
 	else
 		echo "Error: Unable to find apt-get, yum, or Homebrew/Linuxbrew."
 		read -p "Please install $installation before continuing."
@@ -50,6 +49,8 @@ elif [ "$(which wget)" == "" ]; then
 	read -p "Please install $installation before continuing."
 	kill -INT $$
 fi
+
+netcdf_prefix="$(nc-config --prefix)" #This way the user doesn't have to enter the netcdf prefix
 
 #These next three commands rename the WRF files so that they don't have a capitalized tar component (otherwise the tar command fails)
 [ -e "WRFV$wrf_version.TAR.gz" ] && $unsudo mv WRFV$wrf_version.TAR.gz WRFV$wrf_version.tar.gz

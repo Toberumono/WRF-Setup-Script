@@ -3,6 +3,7 @@ wrf_major_version="3"
 wrf_minor_version="7"
 
 #These set the compilers to be used when configuring WRF and WPS.  Make sure to enclose these in backticks (`) instead of quotes (")
+compilers="gcc gfortran" #Determines which compilers should be installed (if any), you can change this to set which compilers are used. [Default: "gcc gfortran"]
 mpich_compilers=`CC=mpicc FC=mpif90` #This sets the compilers to be used when building with MPICH. [Default: `CC=mpicc FC=mpif90`]
 
 #Toggles for optional components
@@ -17,7 +18,6 @@ lazy_recompile=true #Don't recompile already compiled libs [Default: true]
 geog_path="geog"
 
 #Paths
-netcdf_prefix="/usr" #The path to the directory that includes the 'include' and 'lib' directories that NETCDF is using. [Default: "/usr"]
 backup_dir="$(pwd)" #The directory used for backups. [Default: "$(pwd)"]
 
 #Don't change any variables below this line unless absolutely necessary
