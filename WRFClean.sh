@@ -18,7 +18,7 @@ print_help() {
 #specifically switch back to that user for the duration of the command.
 #If we aren't running as sudo, then we don't need this command, so it is set to ""
 [ $SUDO_USER ] && unsudo="sudo -u $SUDO_USER" || unsudo=""
-if [ $unsudo != "" ]; then
+if [ "$unsudo" != "" ]; then
 	echo "This script should NOT be run as sudo."
 	echo "Therefore, each command will call $unsudo first"
 fi
