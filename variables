@@ -17,7 +17,7 @@ lazy_recompile=true #Don't recompile already compiled libs [Default: true]
 geog_path="geog"
 
 #Paths
-netcdf_prefix="/usr" #The path to the directory that includes the 'include' and 'lib' directories that NETCDF is using.
+netcdf_prefix="/usr" #The path to the directory that includes the 'include' and 'lib' directories that NETCDF is using. [Default: "/usr"]
 backup_dir="$(pwd)" #The directory used for backups. [Default: "$(pwd)"]
 
 #Don't change any variables below this line unless absolutely necessary
