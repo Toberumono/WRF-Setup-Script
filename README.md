@@ -11,7 +11,7 @@ This is a pair of scripts that automate the process of configuring a computer to
 	4. If it is run on an existing WRF and/or WPS installation, it backs up namelist files and restores them automatically.
 + WRFClean.sh
 	1. Cleans WRF and WPS installations.
-	2. Backs up namelist.input and namelist.wps files such that the WRFSetup.sh script can restore them.
+	2. Backs up namelist.input and namelist.wps files so that the WRFSetup.sh script can restore them.
 
 ## <a name="wdtsnd"></a>What do these scripts not do?
 
