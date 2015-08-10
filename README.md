@@ -5,7 +5,7 @@ This is a pair of scripts that automate the process of configuring a computer to
 ## <a name="wdtsd"></a>What do these scripts do?
 
 + WRFSetup.sh
-	1. Installs the libraries that WRF requires (this requires sudo).
+	1. Installs the libraries that WRF requires (this requires sudo on Linux).
 	2. Sets the environment variables needed for WRF to configure correctly.
 	3. Calls the WPS and WRF configure and compile scripts in the order needed.  All you need to do is enter 3 numbers and pick the version of WRF you want.
 	4. If it is run on an existing WRF and/or WPS installation, it backs up namelist files and restores them automatically.
@@ -25,7 +25,7 @@ This is a pair of scripts that automate the process of configuring a computer to
 
 ## <a name="owsiut"></a>Okay, why should I use this?
 
-1. Installing WRF and WPS is a huge pain if you haven't found some miracle guide that doesn't give a bunch of outdated or incorrect information about WRF's requirements.  This eliminates that problem to a large extent.
+1. Installing WRF and WPS is rather difficult unless you already know what you are doing, and most of the guides either have outdated information or assume that the follower has more information that they actually do.  This eliminates that problem to a large extent.
 2. Setting up WRF can require a lot of trial and error, so having a method of resetting your WRF and WPS installations that also backs up your namlist files is really helpful.
   1. Yes, the WRFSetup script detects if namelist files were backed up by the WRFCleanup script.
   2. Why?  Because I accidently deleted my namelist files a few times before I wrote that.
@@ -42,8 +42,8 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 
 ### A few notes
 1. This script **requires** that you have the tarballs for WRF and WPS in the same directory as the script.
-2. Make sure you do **not** have *any* spaces in the path to your WRF directory.  *This is* **essential** *to successful compilation of WRF and WPS.*
-3. You will need sudo privileges the first time you run this script, unless you previously installed all of the required software (which is unlikely).
+2. Make sure you do **not** have *any* spaces in the path to the directory containing the script and tarballs.  *This is* **essential** *to successful compilation of WRF and WPS.*
+3. Unless you have previously installed [Homebrew](http://brew.sh) or [Linuxbrew](https://github.com/Homebrew/linuxbrew) (as appropriate for your operating system), you will need sudo privileges the first time you run this script.
 
 ### Preparation
 1. Either download this script via git or via the Download Zip button right below the git url (scroll up to the top and look at the column on the right).
@@ -52,5 +52,4 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 
 ### Running the script
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
-2. Run `sudo ./WRFSetup.sh` if you are not sure if all of the required software is installed.  Otherwise, run `./WRFSetup.sh` (sudo is not required to configure or compile WRF or WPS).
-3. Due to the nature of the geogrid downloads, there isn't a consistent naming convention that we can use.  Therefore, you will need to unpack the geogrid data yourself.
+2. Run `sudo ./WRFSetup.sh` if you are not sure if all of the required software is installed and you do not have [Homebrew](http://brew.sh) or [Linuxbrew](https://github.com/Homebrew/linuxbrew) installed.  Otherwise, run `./WRFSetup.sh` (sudo is not required to configure or compile WRF or WPS).
