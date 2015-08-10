@@ -71,11 +71,7 @@ fi
 #Export variables for when this script is not run with sudo.
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 export NETCDF=$netcdf_prefix
-if ( $with_mpi ); then
-	export $mpich_compilers
-else
-	export $compilers
-fi
+export $mpich_compilers
 
 cd $wrf_path #Starting WRF
 
