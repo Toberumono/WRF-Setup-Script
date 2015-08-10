@@ -32,12 +32,7 @@ This is a pair of scripts that automate the process of configuring a computer to
 3. Overall, using these scripts is simply easier.
 
 ## <a name="wloediniotuts"></a>What level of experience do I need in order to use this script?
-
-1. You need to be able to intelligently select downloads (aka read the instructions)
-2. You need to be familiar with a few terminal commands:
-  1. 'cd' (You will have to change directories a couple times)
-  2. 'mkdir' (Probably - having a good directory structure is important)
-  3. 'sudo' (You will need admin privelidges in order to run this script the first time)
+This guide does assume a basic level of comfort with a UNIX-based prompt. If you are new to working with Terminal, tutorial one at http://www.ee.surrey.ac.uk/Teaching/Unix/ will cover everything you need for this tutorial. (Its prompt likely looks a bit different, but those commands are effectively identical across UNIX shells)
 
 ## Okay, how do I use this?
 
