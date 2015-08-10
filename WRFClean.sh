@@ -56,10 +56,9 @@ else
 	clean_wrf=true
 	clean_wps=true
 fi
+text=$text" with ./clean"
 if ( $use_a ); then
-	text=$text" with ./clean -a"
-else
-	text=$text"with ./clean"
+	text=$text" -a"
 fi
 
 read -p "This script will clean your $text.  Press [Enter] to continue, [q] to quit. " cont
