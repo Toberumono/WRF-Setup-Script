@@ -1,16 +1,16 @@
 #!/bin/bash
 . variables
 print_help() {
-	echo "This utility cleans WRF and WPS installations and (optionally) backs up their namelist files."
+	echo "This script cleans WRF and WPS installations and (optionally) backs up their namelist files."
+	echo "This script does NOT require sudo and should not be run as sudo, root, etc."
 	echo "Usage: ./WRFClean.sh [([wrf] [wps] [-a]|-h|--help)] (in any order, case insensitive)"
 	echo "wrf -> clean WRF"
 	echo "wps -> clean WPS"
 	echo "-a -> appends -a to the clean calls"
 	echo "-h -> display this help text"
 	echo "--help -> -h"
-	echo "If wrf or wps are provided, it will only clean the ones that are provided"
+	echo "If 'wrf' or 'wps' is provided, it will only clean the ones that are provided"
 	echo "\t(so, './WRFClean.sh' is equivalent to './WRFClean.sh wrf wps')"
-	
 }
 
 #In order to run the WRF and WPS clean scripts as the user that called this script
@@ -45,7 +45,7 @@ if ( $clean_wrf ); then
 	else
 		text=$text" installation"
 	fi
-elif ( $clean_wps); then
+elif ( $clean_wps ); then
 	text="wps installation"
 else
 	clean_wrf=true
