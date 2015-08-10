@@ -2,29 +2,28 @@
 wrf_major_version="3"
 wrf_minor_version="7"
 
-#Change this if you don't want to install gcc/gfortran
-#Due to how Homebrew works, this does not function on Macs.
-compilers="gcc gfortran"
+#These set the compilers to be used when configuring WRF and WPS.  Make sure to enclose these in backticks (`) instead of quotes (")
+compilers=`CC=gcc FC=gfortran` #If you are not using MPICH, you can change this to set which compilers are used. [Default: `CC=gcc FC=gfortran`]
+mpich_compilers=`CC=mpicc FC=mpif90` #This sets the compilers to be used when building with MPICH. [Default: `CC=mpicc FC=mpif90`]
 
 #Toggles for optional components
-keep_namelists=true #WRF sometimes deletes namelist files on recompile.  This backs them up. [Default: true]
+use_mpich=true #Toggle whether MPICH should be used.  This MUST be set to true if you intend to configure WRF for DMPAR. [Default: true]
+keep_namelists=true #WRF sometimes deletes namelist files during recompile or clean operations.  This backs them up and restores them. [Default: true]
 use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
 use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
 force_extract_tars=false #If true, the script always extracts every tarball, regardless if they already have been extracted [Default: false]
 lazy_recompile=true #Don't recompile already compiled libs [Default: true]
 
+#Unlike WRF and WPS, the geogrid data can be extracted to any location.  [Default: "geog"]
+#This path can be relative to the run directory (like the default value) or an absolute path.
+geog_path="geog"
+
 #Paths
-netcdf_prefix="/usr"
+netcdf_prefix="/usr" #The path to the directory that includes the 'include' and 'lib' directories that NETCDF is using.
+backup_dir="$(pwd)" #The directory used for backups. [Default: "$(pwd)"]
 
 #Don't change any variables below this line unless absolutely necessary
 wrf_version=$wrf_major_version.$wrf_minor_version
-mpich_compilers=`CC=mpicc FC=mpif90`
-
-#Untar'd paths
-WRF_path="WRFV$wrf_major_version"
-WRF_Chem_path="$WRF_path/chem"
-WPS_path="WPS"
-
-
-#The directory used for backups. [Default: "$(pwd)"]
-DIR="$(pwd)"
+wrf_path="WRFV$wrf_major_version"
+wrf_chem_path="$wrf_path/chem"
+wps_path="WPS"
