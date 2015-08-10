@@ -79,7 +79,7 @@ fi
 $unsudo ./configure 2>&1 | $unsudo tee ./configure.log #Configure WRF, and output to both a log file and the terminal.
 
 #Run the WRF regex fixes if they are enabled in 'variables'
-#This jsut adds -lgomp to the LIB_EXTERNAL variable.
+#This just adds -lgomp to the LIB_EXTERNAL variable.
 ( $use_wrf_regex_fixes ) && $unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf || echo "Skipping WRF regex fixes."
 
 $unsudo ./compile wrf 2>&1 | $unsudo tee ./compile_wrf.log #Compile WRF, and output to both a log file and the terminal.
