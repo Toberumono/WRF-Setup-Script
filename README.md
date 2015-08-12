@@ -14,17 +14,15 @@ This is a pair of scripts that automate the process of configuring a computer to
 	- Backs up namelist.input and namelist.wps files so that the WRFSetup.sh script can restore them.
 
 ## <a name="wdtsnd"></a>What do these scripts not do?
-### Both
-* Do not run on Windows.  They are Bash scripts, and therefore run on Linux and OSX *only*.<br>
+* Both
+	+ Do not run on Windows.  They are Bash scripts, and therefore run on Linux and OSX *only*.<br>
 	Furthermore, they assume gcc/gfortran compilers.
-	+ If you want to use a different compiler, then you can change the compiler variable in the variables file; however, it has only been tested with gcc/gfortran.
-
-### WRFSetup.sh
-* Does not download the tarballs for WRF, WPS, or the GEOGRID data - that would require circumventing UCAR's login system.
-* Does not run WRF.  My [WRF Runner](https://github.com/toberumono/WRF-Runner) project handles that.
-
-### WRFClean.sh
-* Does not uninstall the libraries and support programs that were installed by WRFSetup.sh - that is far too risky because some of them are almost certainly used by other programs.
+		- If you want to use a different compiler, then you can change the compiler variable in the variables file; however, it has only been tested with gcc/gfortran.
+* WRFSetup.sh
+	+ Does not download the tarballs for WRF, WPS, or the GEOGRID data - that would require circumventing UCAR's login system.
+	+ Does not run WRF.  My [WRF Runner](https://github.com/toberumono/WRF-Runner) project handles that.
+* WRFClean.sh
+	+ Does not uninstall the libraries and support programs that were installed by WRFSetup.sh - that is far too risky because some of them are almost certainly used by other programs.
 
 ## <a name-"wsiut"></a>Why should I use this?
 
