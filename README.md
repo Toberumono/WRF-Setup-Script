@@ -5,19 +5,19 @@ This is a pair of scripts that automate the process of configuring a computer to
 ## <a name="wdtsd"></a>What do these scripts do?
 
 + WRFSetup.sh
-	1. Installs the libraries that WRF requires (this requires sudo on Linux).
-	2. Sets the environment variables needed for WRF to configure correctly.
-	3. Calls the WPS and WRF configure and compile scripts in the order needed.  All you need to do is enter 3 numbers and pick the version of WRF you want.
-	4. If it is run on an existing WRF and/or WPS installation, it backs up namelist files and restores them automatically.
+	- Installs the libraries that WRF requires (this requires sudo on Linux).
+	- Sets the environment variables needed for WRF to configure correctly.
+	- Calls the WPS and WRF configure and compile scripts in the order needed.  All you need to do is enter 3 numbers and pick the version of WRF you want.
+	- If it is run on an existing WRF and/or WPS installation, it backs up namelist files and restores them automatically.
 + WRFClean.sh
-	1. Cleans WRF and WPS installations.
-	2. Backs up namelist.input and namelist.wps files so that the WRFSetup.sh script can restore them.
+	- Cleans WRF and WPS installations.
+	- Backs up namelist.input and namelist.wps files so that the WRFSetup.sh script can restore them.
 
 ## <a name="wdtsnd"></a>What do these scripts not do?
 
-* Do not run on Windows.  They are Bash scripts, and therefore run on Linux and OSX *only*.  Furthermore, they assume gcc/gfortran compilers.
+* Do not run on Windows.  They are Bash scripts, and therefore run on Linux and OSX *only*.<br>
+	Furthermore, they assume gcc/gfortran compilers.
 	+ If you want to use a different compiler, then you can change the compiler variable in the variables file; however, it has only been tested with gcc/gfortran.
-
 * WRFSetup.sh
 	+ Does not download the tarballs for WRF, WPS, or the GEOGRID data - that would require circumventing UCAR's login system.
 	+ Does not run WRF.  My [WRF Runner](https://github.com/toberumono/WRF-Runner) project handles that.
