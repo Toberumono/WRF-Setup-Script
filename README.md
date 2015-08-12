@@ -27,9 +27,9 @@ This is a pair of scripts that automate the process of configuring a computer to
 ## <a name-"wsiut"></a>Why should I use this?
 
 * Manually setting up WRF and WPS requires setting a decent number of environment variables and executing commands that may not be familiar to an average user.
-	Both of these can be intimidating, and some of them require information that can be difficult for a user to look up, but trivial for a script to find.
+	- Both of these can be intimidating, and some of them require information that can be difficult for a user to look up, but trivial for a script to find.
 * Setting up WRF and WPS entails a decent amount of trial and error to figure out which configuration works best for you.
-	These scripts automatically back up the important configuration files so that you don't have to worry about it.
+	- These scripts automatically back up the important configuration files so that you don't have to worry about it.
 
 ## <a name="wloediniotuts"></a>What level of experience do I need in order to use this script?
 This guide does assume a basic level of comfort with a UNIX-based prompt. If you are new to working with Terminal, tutorial one at [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/) will cover everything you need for this tutorial. (Its prompt likely looks a bit different, but those commands are effectively identical across UNIX shells)
@@ -47,7 +47,7 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 
 ### Preparation
 1. Either download this script via git or via the Download Zip button right below the git url (scroll up to the top and look at the column on the right).
-  + If you're using git, cd into the directory you want to set up WRF and WPS and run:
+  + If you're using git, cd into the directory you want to set up WRF and WPS and run:<br>
     `git clone https://github.com/Toberumono/WRF-Setup-Script.git .`
 2. Download the tarballs for WRF, WPS, WRF-Chem and the WPS GEOGRID data (Available from the WRF website, [www2.mmm.ucar.edu/wrf/users/download/get_source.html](www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
 
