@@ -55,4 +55,5 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
 2. Run `sudo ./WRFSetup.sh` if you are not sure if all of the required software is installed and you do not have [Homebrew](http://brew.sh) or [Linuxbrew](https://github.com/Homebrew/linuxbrew) installed.  Otherwise, run `./WRFSetup.sh` (sudo is not required to configure or compile WRF or WPS and Homebrew/Linuxbrew do not require sudo in order to install the support software).
 	+ Depending on how many libraries need to be installed, this could take a *long* time.
+	+ If you have not already installed gcc/gfortran on your system, this will take a *very long* time and will likely look like it is hanging.  Give it time (sometimes over an hour), and it will complete.
 	+ There may be a bunch of warnings about things already being tapped or installed.  This is normal - it just means that 'brew has detected that some of the requirements were already installed.
