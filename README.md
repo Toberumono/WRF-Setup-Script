@@ -48,10 +48,7 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 ### Preparation
 1. Either download this script via git or via the Download Zip button right below the git url (scroll up to the top and look at the column on the right).
   + If you're using git, cd into the directory you want to set up WRF and WPS and run:
-
-  	```bash
-  	git clone https://github.com/Toberumono/WRF-Setup-Script.git .
-  	```
+    `git clone https://github.com/Toberumono/WRF-Setup-Script.git .`
 2. Download the tarballs for WRF, WPS, WRF-Chem and the WPS GEOGRID data (Available from the WRF website, [www2.mmm.ucar.edu/wrf/users/download/get_source.html](www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
 
 ### Running the script
