@@ -6,11 +6,12 @@ fet=$force_extract_tars #for convenience
 #(so that the files can be edited without sudo) when this script is called with sudo, we have to use sudo to
 #specifically switch back to that user for the duration of the command.
 #If we aren't running as sudo, then we don't need this command, so it is set to ""
-[ $SUDO_USER ] && unsudo="sudo -u $SUDO_USER WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers" || unsudo=""
+. <(wget -qO - "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/unsudo.sh")
+[ "$unsudo" != "" ] && unsudo=$unsudo" WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers"
 
 if ( ! $keep_namelists ); then
 	read -p "keep_namelists in 'variables' is currently set to false. If you proceed, you will loose any existing namelist files. Is this okay? [y/N] " yn
-	declare -l yn
+	yn=$(echo "$yn" | tr '[:upper:]' '[:lower:]')
 	if [ "$yn" != "y" ]; then
 		keep_namelists=true
 		echo "Changed keep_namelists to true for this run. Please change the value in 'variables' if you wish to avoid this prompt."
@@ -97,7 +98,7 @@ $unsudo ./compile #Calling compile without arguments causes a list of valid test
 
 echo "Please enter the test case you would like to run (this can include the '-j n' part) or none [Default: none]:"
 read test_case
-declare -l test_case
+test_case=$(echo "$test_case" | tr '[:upper:]' '[:lower:]')
 if [ $(echo ${#test_case}) -gt 4 ] && [ "$test_case" != "" -a "$test_case" != "none" ]; then
 	$unsudo ./compile "$test_case" 2>&1 | $unsudo tee ./compile_test_case.log
 else
