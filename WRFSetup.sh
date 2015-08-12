@@ -66,10 +66,10 @@ $fet || [ ! -d "$wrf_chem_path" ]	&& $unsudo tar zxvf WRFV$wrf_major_version-Che
 $fet || [ ! -d "$wps_path" ]		&& $unsudo tar zxvf WPSV$wrf_version.tar.gz || echo "Already extracted WPS"
 if [ -e "geog_complete.tar.bz2" ]; then
 	mkdir -p "$geog_path"
-	$fet || [ ! -d "$geog_path" ]		&& $unsudo tar xjvf geog_complete.tar.bz2 -C "$geog_path" || echo "Already extracted GEOG"
+	$fet || [ ! -d "$geog_path" ]	&& $unsudo tar xjvf geog_complete.tar.bz2 -C "$geog_path" || echo "Already extracted GEOG"
 elif [ -e "geog_minimum.tar.bz2" ]; then
 	mkdir -p "$geog_path"
-	$fet || [ ! -d "$geog_path" ]		&& $unsudo tar xjvf geog_minimum.tar.bz2 -C "$geog_path" || echo "Already extracted GEOG"
+	$fet || [ ! -d "$geog_path" ]	&& $unsudo tar xjvf geog_minimum.tar.bz2 -C "$geog_path" || echo "Already extracted GEOG"
 fi
 
 #Export variables for when this script is not run with sudo.
