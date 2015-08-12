@@ -46,10 +46,11 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 3. Unless you have previously installed [Homebrew](http://brew.sh) or [Linuxbrew](https://github.com/Homebrew/linuxbrew) (as appropriate for your operating system), you will need sudo privileges the first time you run this script.
 
 ### Preparation
-1. Either download this script via git or via the Download Zip button right below the git url (scroll up to the top and look at the column on the right).
+1. If you are on a Mac, you *will* have to install [Homebrew](http://brew.sh) - compiling the required libraries from source is pointlessly complicated.
+2. Either download this script via git or via the Download Zip button right below the git url (scroll up to the top and look at the column on the right).
   + If you're using git, cd into the directory you want to set up WRF and WPS (it *must be empty*) and run:<br>
     `git clone https://github.com/Toberumono/WRF-Setup-Script.git .`
-2. Download the tarballs for WRF, WPS, WRF-Chem and the WPS GEOGRID data (Available from the WRF website, [www2.mmm.ucar.edu/wrf/users/download/get_source.html](www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
+3. Download the tarballs for WRF, WPS, WRF-Chem and the WPS GEOGRID data (Available from the WRF website, [www2.mmm.ucar.edu/wrf/users/download/get_source.html](www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
 
 ### Running the script
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
