@@ -29,12 +29,9 @@ if [ "$(which brew)" != "" ]; then #Homebrew or Linuxbrew was detecteted.
 	$unsudo brew tap homebrew/science
 	$unsudo brew tap homebrew/dupes
 	installation="wget ncurses cairo libpng szip lzlib pixman doxygen mpich2 tcsh hdf5 ncl"
-	if [ "$(which m4)" == "" ]; then
-		installation="m4 "$installation
-	fi
-	if [ "$(which git)" == "" ]; then
-		installation="git "$installation
-	fi
+	[ "$(which gfortran)" == "" ] && $unsudo brew install "gcc" #gfortran is included in Homebrew/Linuxbrew's gcc
+	[ "$(which m4)" == "" ] && installation="m4 "$installation
+	[ "$(which git)" == "" ] && installation="git "$installation
 	$unsudo brew install "netcdf" "--with-fortran"
 	$unsudo brew install $installation
 elif [ "$unsudo" != "" ]; then
