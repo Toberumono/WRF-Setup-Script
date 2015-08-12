@@ -7,7 +7,7 @@ fet=$force_extract_tars #for convenience
 #specifically switch back to that user for the duration of the command.
 #If we aren't running as sudo, then we don't need this command, so it is set to ""
 . <(wget -qO - "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/unsudo.sh")
-[ "$unsudo" != "" ] && unsudo=$unsudo" WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers"
+[ "$unsudo" != "" ] && unsudo=$unsudo" WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers" || unsudo=""
 
 if ( ! $keep_namelists ); then
 	read -p "keep_namelists in 'variables' is currently set to false. If you proceed, you will loose any existing namelist files. Is this okay? [y/N] " yn
@@ -47,7 +47,7 @@ fi
 if [ "$(which wget)" == "" ]; then
 	echo "Error: Support software failed to install."
 	read -p "Please install $installation before continuing."
-	kill -INT $$
+	exit 1
 fi
 
 netcdf_prefix="$(nc-config --prefix)" #This way the user doesn't have to enter the netcdf prefix
