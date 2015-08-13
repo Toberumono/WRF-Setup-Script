@@ -82,13 +82,16 @@ if ( ! $keep_namelists ); then
 	fi
 fi
 
+set -e
+set -o nounset
+
 #Takes path to directory, name of namelist file, path to folder with namelist file relative to directory (without a trailing '/')
 clean_wrf() {
 	if [ ! -e "$1" ]; then
 		echo "Could not find $1.  Skipping."
 	else
 		cd "$1"
-		[ "$#" > 3 ] && [ "$3" != "" ] && local np="$3" || local np="."
+		[ "$#" -gt "3" ] && [ "$3" != "" ] && local np="$3" || local np="."
 		if ( $keep_namelists ) && [ -e "$np/$2" ]; then
 			$unsudo cp "$np/$2" "$backup_dir/$2.back"
 		fi

@@ -2,7 +2,7 @@
 wrf_major_version="3"
 wrf_minor_version="7"
 
-#These set the compilers to be used when configuring WRF and WPS.  Make sure to enclose these in backticks (`) instead of quotes (")
+#These set the compilers to be used when configuring WRF and WPS.
 compilers="gcc gfortran" #Determines which compilers should be installed (if any).  This has no effect when using Homebrew/Linuxbrew. [Default: "gcc gfortran"]
 mpich_compilers="CC=mpicc FC=mpif90" #This sets the compilers to be used when building with MPICH. [Default: "CC=mpicc FC=mpif90"]
 
