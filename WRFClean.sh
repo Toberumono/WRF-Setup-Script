@@ -39,7 +39,11 @@ do
 		clean_wps=true
 	else
 		print_help
-		kill -INT $$
+		if [ "$var" != "--help" ] && [ "$var" != "-h" ]; then
+			exit 1
+		else
+			exit 0
+		fi
 	fi
 done
 text="wrf and wps installations"
@@ -61,10 +65,10 @@ if ( $use_a ); then
 	text=$text" -a"
 fi
 
-read -p "This script will clean your $text.  Press [Enter] to continue, [q] to quit. " cont
-cont=$(echo "$cont" | tr '[:upper:]' '[:lower:]')
-if [ "$cont" == "q" ]; then
-	kill -INT $$
+read -n1 -p "This script will clean your $text.  Press [Enter] to continue, any other key to quit. " cont
+if [ "$cont" != "" ]; then
+	echo ""; echo "Canceled.";
+	exit 1
 fi
 
 if ( ! $keep_namelists ); then
@@ -74,35 +78,29 @@ if ( ! $keep_namelists ); then
 		keep_namelists=true
 		echo "Changed keep_namelists to true for this run. Please change the value in 'variables' if you wish to avoid this prompt."
 	else
-		read -p "Leaving keep_namelists false. Some existing namelists may be deleted. Press [Enter] to continue."
+		read -n1 -p "Leaving keep_namelists false. Some existing namelists may be deleted. Press any key to continue."
 	fi
 fi
 
-set -e
-set -o nounset
+#Takes path to directory, name of namelist file, path to folder with namelist file relative to directory (without a trailing '/')
+clean_wrf() {
+	if [ ! -e "$1" ]; then
+		echo "Could not find $1.  Skipping."
+	else
+		cd "$1"
+		[ "$#" > 3 ] && [ "$3" != "" ] && local np="$3" || local np="."
+		if ( $keep_namelists ) && [ -e "$np/$2" ]; then
+			$unsudo cp "$np/$2" "$backup_dir/$2.back"
+		fi
+		( $use_a ) && $unsudo ./clean -a || $unsudo ./clean
+		cd ../
+	fi
+}
 
 if ( $clean_wrf ); then
-	cd $wrf_path
-	if ( $keep_namelists ) && [ -e "./run/namelist.input" ]; then
-		$unsudo cp "./run/namelist.input" "$backup_dir/namelist.input.back"
-	fi
-	if ( $use_a ); then
-		$unsudo ./clean -a
-	else
-		$unsudo ./clean
-	fi
-	cd ../
+	clean_wrf "$wrf_path" "namelist.input" "./run"
 fi
 
 if ( $clean_wps ); then
-	cd $wps_path
-	if [ $keep_namelists -a -e "./namelist.wps" ]; then
-		$unsudo cp "./namelist.wps" "$backup_dir/namelist.wps.back"
-	fi
-	if ( $use_a ); then
-		$unsudo ./clean -a
-	else
-		$unsudo ./clean
-	fi
-	cd ../
+	clean_wrf "$wps_path" "namelist.wps"
 fi
