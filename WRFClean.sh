@@ -82,7 +82,6 @@ if ( ! $keep_namelists ); then
 	fi
 fi
 
-set -e
 set -o nounset
 
 #Takes path to directory, name of namelist file, path to folder with namelist file relative to directory (without a trailing '/')
