@@ -7,7 +7,6 @@ fet=$force_extract_tars #for convenience
 #specifically switch back to that user for the duration of the command.
 #If we aren't running as sudo, then we don't need this command, so it is set to ""
 . <(wget -qO - "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/unsudo.sh")
-[ "$unsudo" != "" ] && unsudo=$unsudo" WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers" || unsudo=""
 
 #echos 1 if the directory exists and has files in it
 unpacked_test() {
@@ -25,7 +24,7 @@ unpack_wrf_tarball() {
 			return 1
 		fi
 		( [ "$#" -lt "4" ] || ( $4 ) ) && local outpath="$1/../" || local outpath="$1"
-		mkdir -p "$1"
+		$unsudo mkdir -p "$1"
 		$unsudo tar "$params" "$2" "-C" "$outpath"
 		echo "Unpacked the $2 tarball"
 	fi
@@ -53,8 +52,6 @@ fi
 set -o nounset
 
 #This command installs all of the required libraries.
-installation="git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev"
-installation=$installation" libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 if [ "$(which brew)" != "" ]; then #Homebrew or Linuxbrew was detected.
 	$unsudo brew tap homebrew/science
 	$unsudo brew tap homebrew/dupes
@@ -68,8 +65,13 @@ if [ "$(which brew)" != "" ]; then #Homebrew or Linuxbrew was detected.
 	$unsudo brew install $installation
 elif [ "$unsudo" != "" ]; then
 	if [ "$(which apt-get)" != "" ]; then #apt-get was detected.
+		installation="git wget libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev"
+		installation=$installation" libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 		apt-get install "build-essential "$installation
 	elif [ "$(which yum)" != "" ]; then #yum was detected.
+		installation="git wget jasper jasper-libs jasper-devel zlib zlib-devel libpng12 libpng12-dev"
+		installation=$installation" libX11 libX11-devel cairo cairo-devel pixman pixman-devel m4 doxygen hdf5 hdf5-devel netcdf netcdf-fortran"
+		installation=$installation" netcdf-devel netcdf-fortran-devel mpich"
 		yum groupinstall 'Development Tools' && yum install $installation
 	else
 		echo "Error: Unable to find Homebrew/Linuxbrew, apt-get, or yum."
@@ -106,6 +108,7 @@ unset yn
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 export NETCDF=$netcdf_prefix
 export $mpich_compilers
+[ "$unsudo" != "" ] && unsudo=$unsudo" WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers" || unsudo=""
 
 skip=false
 if [ -e "$wrf_path/run/wrf.exe" ]; then
