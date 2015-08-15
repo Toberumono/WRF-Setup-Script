@@ -69,9 +69,9 @@ elif [ "$unsudo" != "" ]; then
 		installation=$installation" libx11-dev libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 		apt-get install "build-essential "$installation
 	elif [ "$(which yum)" != "" ]; then #yum was detected.
-		installation="git wget jasper jasper-libs jasper-devel zlib zlib-devel libpng12 libpng12-dev"
-		installation=$installation" libX11 libX11-devel cairo cairo-devel pixman pixman-devel m4 doxygen hdf5 hdf5-devel netcdf netcdf-fortran"
-		installation=$installation" netcdf-devel netcdf-fortran-devel mpich"
+		installation="git wget jasper jasper-libs jasper-devel zlib zlib-devel libpng12 libpng12-devel libX11 libX11-devel"
+		installation=$installation" cairo cairo-devel pixman pixman-devel m4 doxygen hdf5 hdf5-devel netcdf netcdf-fortran"
+		installation=$installation" netcdf-devel netcdf-fortran-devel mpich tcsh"
 		yum groupinstall 'Development Tools' && yum install $installation
 	else
 		echo "Error: Unable to find Homebrew/Linuxbrew, apt-get, or yum."
