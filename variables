@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #Change these variables to match your versions
 wrf_major_version="3"
 wrf_minor_version="7.1"
@@ -6,17 +7,17 @@ wrf_minor_version="7.1"
 mpich_compilers="CC=mpicc FC=mpif90" #This sets the compilers to be used when building with MPICH. [Default: "CC=mpicc FC=mpif90"]
 
 #Toggles for optional components
+verbose=false #This will make the WRFSetup.sh script print a lot more information.  Only use it for debugging. [Default: false]
 keep_namelists=true #WRF sometimes deletes namelist files during recompile or clean operations.  This backs them up and restores them. [Default: true]
 use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
 use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
 force_extract_tars=false #If true, the script always extracts every tarball, regardless if they already have been extracted [Default: false]
 lazy_recompile=true #Don't recompile already compiled libs [Default: true]
 
+#Paths
 #Unlike WRF and WPS, the geogrid data can be extracted to any location.  [Default: "geog"]
 #This path can be relative to the run directory (like the default value) or an absolute path.
 geog_path="geog"
-
-#Paths
 backup_dir="$(pwd)" #The directory used for backups. [Default: "$(pwd)", the directory from which the script was run]
 
 #Don't change any variables below this line unless absolutely necessary

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 . variables
 print_help() {
 	echo "This script cleans WRF and WPS installations and (optionally) backs up their namelist files."
@@ -90,7 +90,7 @@ clean_wrf() {
 		echo "Could not find $1.  Skipping."
 	else
 		cd "$1"
-		[ "$#" -gt "3" ] && [ "$3" != "" ] && local np="$3" || local np="."
+		[ "$#" -gt "2" ] && [ "$3" != "" ] && local np="$3" || local np="."
 		if ( $keep_namelists ) && [ -e "$np/$2" ]; then
 			$unsudo cp "$np/$2" "$backup_dir/$2.back"
 		fi
