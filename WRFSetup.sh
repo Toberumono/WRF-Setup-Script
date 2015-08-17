@@ -111,8 +111,8 @@ elif [ "$use_pm" == "brew" ]; then
 	( $verbose ) && brew="brew -v" || brew="brew"
 	installation="pv ncurses cairo libpng szip lzlib pixman doxygen mpich2 --build-from-source tcsh hdf5 jasper"
 	#Install prep software
-	[ "$(which git)" == "" ] && brew install "git"		|| echo "Found git"
-	[ "$(which wget)" == "" ] && brew install "wget"	|| echo "Found wget"
+	[ "$(which git)" == "" ] && $unsudo $brew install "git"		|| echo "Found git"
+	[ "$(which wget)" == "" ] && $unsudo $brew install "wget"	|| echo "Found wget"
 	$unsudo $brew tap homebrew/science
 	$unsudo $brew tap homebrew/dupes
 	$unsudo $brew tap caskroom/cask
@@ -122,6 +122,7 @@ elif [ "$use_pm" == "brew" ]; then
 		source "$profile"
 		fortran_flag="--default-fortran-flags"
 	fi
+	$unsudo $brew install brew-cask
 	$unsudo $brew cask install ncar-ncl
 	ncl_current="$(brew --prefix)/ncl-current"
 	[ -e "$ncl_current" ] && rm "$ncl_current"
