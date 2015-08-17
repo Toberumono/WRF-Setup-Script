@@ -32,9 +32,7 @@ unpack_wrf_tarball() {
 	if ( ! $fet ) && [ "$(unpacked_test $1)" -eq "1" ]; then
 		echo "Already unpacked the $2 tarball.  Skipping."
 	else
-		if [ ! -e "$2" ]; then
-			return 1
-		fi
+		[ ! -e "$2" ] && return 1
 		( [ "$#" -lt "4" ] || ( $4 ) ) && local outpath="$1/../" || local outpath="$1"
 		$unsudo mkdir -p "$1"
 		$unsudo pv "$2" | $unsudo tar $params "-C" "$outpath"
@@ -120,7 +118,8 @@ elif [ "$(which brew)" != "" ]; then
 	[ -e "$ncl_current" ] && rm "$ncl_current"
 	ncl_cask="$(ls -td -1 $(brew --prefix)/ncl-* | head -1)"
 	ln -sf "$ncl_cask" "$ncl_current"
-	update_rc "Brewed NCAR-NCL" "$profile" "NCARG_ROOT=$ncl_current" 'PATH="'"$ncl_current"'/bin:$PATH"' 'DYLD_FALLBACK_LIBRARY_PATH='"$(dirname $(gfortran --print-file-name libgfortran.3.dylib))"':$DYLD_FALLBACK_LIBRARY_PATH'
+	update_rc "Brewed NCAR-NCL" "$profile" "NCARG_ROOT=$ncl_current" 'PATH="'"$ncl_current"'/bin:$PATH"' \
+		'DYLD_FALLBACK_LIBRARY_PATH='"$(dirname $(gfortran --print-file-name libgfortran.3.dylib))"':$DYLD_FALLBACK_LIBRARY_PATH'
 	source "$profile"
 	[ "$(which m4)" == "" ] && installation="m4 "$installation || echo "Found m4"
 	installation="$installation netcdf"' --with-fortran --with-cxx-compat'
