@@ -75,8 +75,9 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 	git clone -b "$(git ls-remote --tags https://github.com/Toberumono/WRF-Setup-Script.git | grep -o -E '([0-9]+\.)*[0-9]+$' | sort -g | tail -1)" --depth=1 "https://github.com/Toberumono/WRF-Setup-Script.git" .
 	```
 	+ This command grabs the latest tagged version of the scripts from GitHub and downloads them into the newly-created directory.
-5. Download the tarballs for WRF, WPS, WRF-Chem and the WPS GEOGRID data (Available from the UCAR website, [http://www2.mmm.ucar.edu/wrf/users/download/get_source.html](http://www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
-6. As of this writing, WRF Version 3.7.1 is the latest stable release.  You may need to change the version numbers in the variables file to match the version that you downloaded.
+5. Download the tarballs (tar files) for WRF-ARW, WPS, WRF-Chem and the WPS GEOGRID data (Available from the UCAR website, [http://www2.mmm.ucar.edu/wrf/users/download/get_source.html](http://www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
+6. Move the downloaded tar files into the directory containing the scripts.
+7. As of this writing, WRF Version 3.7.1 is the latest stable release.  You may need to change the version numbers in the variables file to match the version that you downloaded.
 
 ### Running the script
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
