@@ -78,11 +78,11 @@ fi
 #########################################################################
 
 use_pm=""
-( [ "$force_package_manager" != "auto" ] && use_pm="$force_package_manager" ) || \
-( [ "$(uname -s)" == "Darwin" ] && use_pm="brew" ) || \
-( [ "$(which apt)"	!= "" ] && use_pm="apt" ) || \
-( [ "$(which yum)"	!= "" ] && use_pm="yum" ) || \
-( [ "$(which brew)"	!= "" ] && use_pm="brew" )
+if [ "$force_package_manager" != "auto" ]; then use_pm="$force_package_manager";
+elif [ "$(uname -s)" == "Darwin" ]; then use_pm="brew";
+elif [ "$(which apt)" != "" ]; then use_pm="apt";
+elif [ "$(which yum)" != "" ]; then use_pm="yum";
+elif [ "$(which brew)" != "" ]; then use_pm="brew"; fi
 
 checkable="pv git wget gcc gfortran ncl csh m4 doxygen"
 #Install necessary software
