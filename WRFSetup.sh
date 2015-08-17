@@ -112,7 +112,9 @@ elif [ "$use_pm" == "brew" ]; then
 	#Install prep software
 	[ "$(which git)" == "" ] && brew install "git"		|| echo "Found git"
 	[ "$(which wget)" == "" ] && brew install "wget"	|| echo "Found wget"
-	$unsudo $brew tap homebrew/science homebrew/dupes caskroom/cask
+	$unsudo $brew tap homebrew/science
+	$unsudo $brew tap homebrew/dupes
+	$unsudo $brew tap caskroom/cask
 	#If any of gcc, g++, or gfortran is not installed, install one via Homebrew.
 	if [ "$(which gcc)" == "" ] || [ "$(which gfortran)" == "" ] || [ "$(which g++)" == "" ]; then
 		($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/brew_gcc.sh") | $unsudo bash
