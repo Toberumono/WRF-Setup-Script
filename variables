@@ -3,8 +3,12 @@
 wrf_major_version="3"
 wrf_minor_version="7.1"
 
-#These set the compilers to be used when configuring WRF and WPS.
 mpich_compilers="CC=mpicc FC=mpif90" #This sets the compilers to be used when building with MPICH. [Default: "CC=mpicc FC=mpif90"]
+
+#This can force the script to use a particular package manager.  Use with caution.
+#Accepted values: auto, apt, yum, brew. Default: auto.
+#Note: These MUST be lowercase.
+force_package_manager="auto"
 
 #Toggles for optional components
 verbose=false #This will make the WRFSetup.sh script print a lot more information.  Only use it for debugging. [Default: false]

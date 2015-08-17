@@ -77,9 +77,15 @@ fi
 #####                       Installation Logic                      #####
 #########################################################################
 
+use_pm=""
+[ "$force_package_manager" != "auto" ] && use_pm="$force_package_manager" || \
+[ "$(which apt)"	!= "" ] && use_pm="apt" || \
+[ "$(which yum)"	!= "" ] && use_pm="yum" || \
+[ "$(which brew)"	!= "" ] && use_pm="brew"
+
 checkable="pv git wget gcc gfortran ncl csh m4 doxygen"
 #Install necessary software
-if [ "$(which apt)" != "" ]; then
+if [ "$use_pm" == "apt" ]; then
 	echo "Using apt."
 	if [ "$unsudo" == "" ]; then
 		echo "No sudo.  Skipping installation."
@@ -88,7 +94,7 @@ if [ "$(which apt)" != "" ]; then
 		installation=$installation" libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
 		apt-get install $installation
 	fi
-elif [ "$(which yum)" != "" ]; then
+elif [ "$use_pm" == "yum" ]; then
 	echo "Using yum."
 	if [ "$unsudo" == "" ]; then
 		echo "No sudo.  Skipping installation."
@@ -98,7 +104,7 @@ elif [ "$(which yum)" != "" ]; then
 		installation=$installation" netcdf-devel netcdf-fortran-devel mpich tcsh"
 		yum groupinstall 'Development Tools' && yum install $installation
 	fi
-elif [ "$(which brew)" != "" ]; then
+elif [ "$use_pm" == "brew" ]; then
 	echo "Using brew."
 	fortran_flag=""
 	( $verbose ) && brew="brew -v" || brew="brew"
@@ -125,7 +131,9 @@ elif [ "$(which brew)" != "" ]; then
 	installation="$installation netcdf"' --with-fortran --with-cxx-compat'
 	$unsudo $brew install $fortran_flag $installation
 else
-	echo "Could not find apt, yum, or brew.  Proceed without attempting to install support software and libraries?"
+	echo -n "Could not find "
+	[ "$force_package_manager" != "auto" ] && echo -n "$use_pm." || echo -n "apt, yum, or brew."
+	echo "  Proceed without attempting to install support software and libraries?"
 	read -n1 -p "Press Enter to continue, any other key to quit." yn
 	if [ "$yn" != "" ]; then
 		echo ""
