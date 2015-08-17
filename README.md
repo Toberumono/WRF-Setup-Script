@@ -41,20 +41,47 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 ## <a name="Usage"></a><a name="usage"></a>Usage
 ### A few notes
 
-1. This script **requires** that you have the tarballs for WRF, WPS, WRF-Chem, and your preferred GEOGRID data (either the minimum set or the complete set) in the same directory as the script.
-2. Make sure you do **not** have *any* spaces in the path to the directory containing the script and tarballs.  *This is* **essential** *to successful compilation of WRF and WPS.*
-3. Unless you have previously installed [Homebrew](http://brew.sh) or [Linuxbrew](https://github.com/Homebrew/linuxbrew) (as appropriate for your operating system), you will need sudo privileges the first time you run this script.
+1. This script must be run in the same directory as the downloaded WRF, WPS, WRF-Chem, and GEOGRID tarballs.
+2. The path to the downloaded files *cannot* contain *any* spaces - WRF will not compile if the path has spaces.
+3. This script uses [Homebrew](http://brew.sh) on Macs and either Apt or [Linuxbrew](https://github.com/Homebrew/linuxbrew) on Linux.
+
+### Permissions Needed
+
++ Mac OSX
+	+ `WRFSetup.sh`
+		- This script will require sudo privileges to set up [Caskroom](https://github.com/caskroom).
+		- Once [Caskroom](https://github.com/caskroom) has been set up, it does not need sudo privileges.
+	+ `WRFClean.sh`
+		- This script only interacts with WRF and WPS, and does not, therefore, require sudo.
++ Linux
+	+ `WRFSetup.sh`
+		- This script will require sudo privileges when it is first run because it uses apt.
+		- Once the support software has been installed, it does not need sudo privileges.
+	+ `WRFClean.sh`
+		- This script only interacts with WRF and WPS, and does not, therefore, require sudo.
 
 ### Preparation
-1. If you are on a Mac, you *will* have to install [Homebrew](http://brew.sh) - compiling the required libraries from source is pointlessly complicated.
-2. Either download this script via git or via the Download Zip button right below the git url (scroll up to the top and look at the column on the right).
-  + If you're using git, cd into the directory you want to set up WRF and WPS (it *must be empty*) and run:<br>
-    `git clone https://github.com/Toberumono/WRF-Setup-Script.git .`
-3. Download the tarballs for WRF, WPS, WRF-Chem and the WPS GEOGRID data (Available from the WRF website, [www2.mmm.ucar.edu/wrf/users/download/get_source.html](www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
+
+1. On Mac, install [Homebrew](http://brew.sh).
+2. If your system does not have Git (run `which git` in Terminal, if a path shows up, your system has Git), run:
+	+ Debian Linux (e.g. Ubuntu):
+		- `sudo apt-get install git`
+	+ Mac OSX
+		- `brew install git`
+3. Create an empty directory.
+4. In Terminal, cd into that directory and run:
+
+	```bash
+	git clone -b "$(git ls-remote --tags https://github.com/Toberumono/WRF-Setup-Script.git | grep -o -E '([0-9]+\.)*[0-9]+$' | sort -g | tail -1)" --depth=1 "https://github.com/Toberumono/WRF-Setup-Script.git" .
+	```
+	+ This command grabs the latest tagged version of the scripts from GitHub and downloads them into the newly-created directory.
+5. Download the tarballs for WRF, WPS, WRF-Chem and the WPS GEOGRID data (Available from the UCAR website, [www2.mmm.ucar.edu/wrf/users/download/get_source.html](www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
+6. As of this writing, WRF Version 3.7.1 is the latest stable release.  You may need to change the version numbers in the variables file to match the version that you downloaded.
 
 ### Running the script
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
-2. Run `sudo ./WRFSetup.sh` if you are not sure if all of the required software is installed and you do not have [Homebrew](http://brew.sh) or [Linuxbrew](https://github.com/Homebrew/linuxbrew) installed.  Otherwise, run `./WRFSetup.sh` (sudo is not required to configure or compile WRF or WPS and Homebrew/Linuxbrew do not require sudo in order to install the support software).
+2. Run `sudo ./WRFSetup.sh` if you have sudo privileges and are not certain that all of the required support software and libraries have been installed and you are not using [Homebrew](http://brew.sh).
 	+ Depending on how many libraries need to be installed, this could take a *long* time.
 	+ If you have not already installed gcc/gfortran on your system, this will take a *very long* time and will likely look like it is hanging.  Give it time (sometimes over an hour), and it will complete.
-	+ There may be a bunch of warnings about things already being tapped or installed.  This is normal - it just means that 'brew has detected that some of the requirements were already installed.
+	+ There may be multiple warnings about things already being tapped or installed.  This is normal - it just means that 'brew has detected that some of the requirements were already installed.
+3. In subsequent runs, the script can be run without sudo regardless of operating system.
