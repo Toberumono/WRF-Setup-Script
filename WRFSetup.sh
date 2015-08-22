@@ -11,10 +11,9 @@ done
 #Get the command to use when grabbing subscripts from GitHub.
 [ "$(which wget)" == "" ] && pull_command="curl -fsSL" || pull_command="wget -qO -"
 
-#Download the update_rc.sh and get_profile.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/update_rc.sh")
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/get_profile.sh")
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/unsudo.sh")
+#Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
+. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
+. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/unsudo.sh")
 
 ########################################################################
 #####                       Support Functions                      #####
@@ -118,7 +117,7 @@ elif [ "$use_pm" == "brew" ]; then
 	$unsudo $brew tap caskroom/cask
 	#If any of gcc, g++, or gfortran is not installed, install one via Homebrew.
 	if [ "$(which gcc)" == "" ] || [ "$(which gfortran)" == "" ] || [ "$(which g++)" == "" ]; then
-		($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/general/brew_gcc.sh") | $unsudo bash
+		($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/brew_gcc.sh") | $unsudo bash
 		source "$profile"
 		fortran_flag="--default-fortran-flags"
 	fi
@@ -128,8 +127,7 @@ elif [ "$use_pm" == "brew" ]; then
 	[ -e "$ncl_current" ] && rm "$ncl_current"
 	ncl_cask="$(ls -td -1 $(brew --prefix)/ncl-* | head -1)"
 	ln -sf "$ncl_cask" "$ncl_current"
-	update_rc "Brewed NCAR-NCL" "$profile" "NCARG_ROOT=$ncl_current" 'PATH="'"$ncl_current"'/bin:$PATH"' \
-		'DYLD_FALLBACK_LIBRARY_PATH='"$(dirname $(gfortran --print-file-name libgfortran.3.dylib))"':$DYLD_FALLBACK_LIBRARY_PATH'
+	bash <($pull_command https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/ncl-ncarg/brewed_path_fix.sh)
 	source "$profile"
 	[ "$(which m4)" == "" ] && installation="m4 "$installation || echo "Found m4"
 	installation="$installation netcdf"' --with-fortran --with-cxx-compat'
@@ -200,9 +198,9 @@ fi
 
 #Configure and Compile
 yn="y"
-if [ -e "$wrf_path/run/wrf.exe" ]; then
+if [ -e "$wrf_path/run/wrf.exe" ]; then #Test for the executables that will always be built
 	read -p "WRF has already been compiled. Would you like to recompile it? [y/N] " yn
-	yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]')
+	yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]') #Convert the user's response to lowercase and keep only the first letter.  This way, yes and no will also work.
 fi
 if [ "$yn" == "y" ]; then
 	cd $wrf_path #Starting WRF
@@ -228,14 +226,16 @@ if [ "$yn" == "y" ]; then
 	( $keep_namelists ) && ( backup_restore_namelist "namelist.input" "restore" "./run" ) || echo "Skipping restoring the WRF Namelist file."
 
 	cd ../ #Finished WRF
+elif [ ! -e "$wrf_path" ] || [ ! -d "$wrf_path" ]; then
+	echo "Unable to locate the $wrf_path directory.  Unable compile or configure WRF.  This will likely cause WPS to fail."
 else
 	echo "Skipping reconfiguring and recompiling WRF."
 fi
 
 yn="y"
-if [ -e "$wps_path/geogrid.exe" ] && [ -e "$wps_path/metgrid.exe" ] && [ -e "$wps_path/ungrib.exe" ]; then
+if [ -e "$wps_path/geogrid.exe" ] && [ -e "$wps_path/metgrid.exe" ] && [ -e "$wps_path/ungrib.exe" ]; then #Test for the executables that will always be built
 	read -p "WPS has already been compiled. Would you like to recompile it? [y/N] " yn
-	yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]')
+	yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]') #Convert the user's response to lowercase and keep only the first letter.  This way, yes and no will also work.
 fi
 if [ "$yn" == "y" ]; then
 	cd $wps_path #Starting WPS
@@ -263,6 +263,8 @@ if [ "$yn" == "y" ]; then
 	( $keep_namelists ) && ( backup_restore_namelist "namelist.wps" "restore" ) || echo "Skipping restoring the WPS Namelist file."
 
 	cd ../ #Finished WPS
+elif [ ! -e "$wps_path" ] || [ ! -d "$wps_path" ]; then
+	echo "Unable to locate the $wps_path directory.  Unable compile or configure WPS."
 else
 	echo "Skipping reconfiguring and recompiling WPS."
 fi
