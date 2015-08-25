@@ -2,6 +2,8 @@
 #Grab variables
 . variables
 fet=$force_extract_tars #for convenience
+verbose=false
+retried=false
 for param in "$@"; do
 	if [ "$param" == "--verbose" ] || [ "$param" == "-v" ]; then
 		verbose=true
