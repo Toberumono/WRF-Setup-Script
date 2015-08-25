@@ -27,7 +27,7 @@ if ( ! $good_shell ); then
 		echo "This is due to Apple packaging a 8+ year-old version of Bash with their operating systems."
 	fi
 	if [ "$(which brew)" != "" ]; then
-		if [ "$(brew list bash | grep 'No such keg')" != "" ]
+		if [ "$(brew list bash | grep 'No such keg')" != "" ]; then
 			echo "Fortunately, because you have Homebrew installed, fixing this is incredibly quick."
 			$brew install "bash"
 			( $verbose ) && ./WRFSetup.sh "--retried" "--verbose" || ./WRFSetup.sh "--retried"
