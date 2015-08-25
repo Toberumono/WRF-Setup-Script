@@ -19,7 +19,7 @@ done
 #Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
 . <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
 if [ "$(echo $profile)" == "" ]; then
-	if ( $retried ); then
+	if [ $retried ]; then
 		echo "Unable to fix the shell.  Please install Bash version 4.3+ and ensure that it is in your path."
 		exit 1
 	fi
@@ -28,7 +28,7 @@ if [ "$(echo $profile)" == "" ]; then
 		echo "This is due to Apple packaging a 8+ year-old version of Bash with their operating systems."
 	fi
 	if [ "$(which brew)" != "" ]; then
-		if [ "$(brew list bash | grep 'No such keg')" != "" ]; then
+		if [ "$(brew info bash | grep '^Not installed')" != "" ]; then
 			echo "Fortunately, because you have Homebrew installed, fixing this is incredibly quick."
 			$brew install "bash"
 			( $verbose ) && ./WRFSetup.sh "--retried" "--verbose" || ./WRFSetup.sh "--retried"
