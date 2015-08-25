@@ -5,14 +5,42 @@ fet=$force_extract_tars #for convenience
 for param in "$@"; do
 	if [ "$param" == "--verbose" ] || [ "$param" == "-v" ]; then
 		verbose=true
+	elif [ "$param" == "--retried" ]; then
+		retried=true
 	fi
 done
+( $verbose ) && brew="brew -v" || brew="brew" #Make brew verbose as needed
 
 #Get the command to use when grabbing subscripts from GitHub.
 [ "$(which wget)" == "" ] && pull_command="curl -fsSL" || pull_command="wget -qO -"
 
 #Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
+good_shell=false
+. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh") && good_shell=true
+if ( ! $good_shell ); then
+	if ( $retried ); then
+		echo "Unable to fix the shell.  Please install Bash version 4.3+ and ensure that it is in your path."
+		exit 1
+	fi
+	echo "The shell environment does not fully support redirection."
+	if [ "$(uname -s)" == "Darwin" ]; then
+		echo "This is due to Apple packaging a 8+ year-old version of Bash with their operating systems."
+	fi
+	if [ "$(which brew)" != "" ]; then
+		if [ "$(brew list bash | grep 'No such keg')" != "" ]
+			echo "Fortunately, because you have Homebrew installed, fixing this is incredibly quick."
+			$brew install "bash"
+			( $verbose ) && ./WRFSetup.sh "--retried" "--verbose" || ./WRFSetup.sh "--retried"
+			exit $?
+		else
+			echo "Unable to fix the shell.  Please install Bash version 4.3+ and ensure that it is in your path."
+			exit 1
+		fi
+	else
+		echo "Unable to fix this without Homebrew.  Please install Homebrew or install Bash version 4.3+ manually."
+		exit 1
+	fi
+fi
 . <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/unsudo.sh")
 
 ########################################################################
@@ -108,7 +136,6 @@ elif [ "$use_pm" == "yum" ]; then
 elif [ "$use_pm" == "brew" ]; then
 	echo "Using brew."
 	fortran_flag=""
-	( $verbose ) && brew="brew -v" || brew="brew"
 	installation="pv ncurses cairo libpng szip lzlib pixman doxygen mpich2 --build-from-source tcsh hdf5 jasper"
 	#Install prep software
 	[ "$(which git)" == "" ] && $unsudo $brew install "git"		|| echo "Found git"
