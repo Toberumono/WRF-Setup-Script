@@ -15,9 +15,8 @@ done
 [ "$(which wget)" == "" ] && pull_command="curl -fsSL" || pull_command="wget -qO -"
 
 #Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
-good_shell=false
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh") && good_shell=true
-if ( ! $good_shell ); then
+. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
+if [ "$(echo $profile)" == "" ]; then
 	if ( $retried ); then
 		echo "Unable to fix the shell.  Please install Bash version 4.3+ and ensure that it is in your path."
 		exit 1
