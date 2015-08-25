@@ -34,8 +34,9 @@ unpack_wrf_tarball() {
 		[ ! -e "$2" ] && return 1
 		( [ "$#" -lt "4" ] || ( $4 ) ) && local outpath="$1/../" || local outpath="$1"
 		$unsudo mkdir -p "$1"
+		echo "Unpacking the $2 tarball."
 		$unsudo pv "$2" | $unsudo tar $params "-C" "$outpath"
-		echo "Unpacked the $2 tarball"
+		echo "Unpacked the $2 tarball."
 	fi
 	return 0
 }
