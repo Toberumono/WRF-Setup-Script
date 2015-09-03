@@ -204,10 +204,12 @@ fi
 #Rename .tars to correct capitalization
 wrf_tar="WRFV$wrf_version"
 wps_tar="WPSV$wrf_version"
+obs_tar="OBSGRID"
 chm_tar="WRFV$wrf_major_version-Chem-$wrf_version"
 
 [ -e "$wrf_tar.TAR.gz" ] && $unsudo mv "$wrf_tar.TAR.gz" "$wrf_tar.tar.gz"
 [ -e "$wps_tar.TAR.gz" ] && $unsudo mv "$wps_tar.TAR.gz" "$wps_tar.tar.gz"
+[ -e "$obs_tar.TAR.gz" ] && $unsudo mv "$obs_tar.TAR.gz" "$obs_tar.tar.gz"
 [ -e "$chm_tar.TAR.gz" ] && $unsudo mv "$chm_tar.TAR.gz" "$chm_tar.tar.gz"
 
 #Unpack tars if needed
@@ -217,6 +219,11 @@ unpack_wrf_tarball "$wrf_path" "$wrf_tar.tar.gz" "-xz${verbose_unpack}"
 
 unpack_wrf_tarball "$wps_path" "$wps_tar.tar.gz" "-xz${verbose_unpack}"
 [ $? != 0 ] && unpack_fail "WPS"
+
+if ( $build_obsgrid ); then
+	unpack_wrf_tarball "$obsgrid_path" "$obs_tar.tar.gz" "-xz${verbose_unpack}"
+	[ $? != 0 ] && unpack_fail "OBSGRID"
+fi
 
 unpack_wrf_tarball "$wrf_chem_path" "$chm_tar.tar.gz" "-xz${verbose_unpack}"
 [ $? != 0 ] && unpack_fail "WRF-Chem"
@@ -329,6 +336,25 @@ wps_setup() {
 general_wrf_component_setup "WPS" "$wps_path" "namelist.wps" "." "wps_setup" \
 "Unable to locate the $wps_path directory.  Unable compile or configure WPS." \
 "./geogrid.exe" "./metgrid.exe" "./ungrib.exe"
+
+obsgrid_setup() {
+	$unsudo ./configure #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
+	if ( $use_obsgrid_regex_fixes ); then
+		#Replace g95 with gfortran in the configure.oa file
+		$unsudo perl -0777 -i -pe 's/g95/gfortran/igs' ./configure.oa
+		#Remove -fendian from the configure.oa file
+		$unsudo perl -0777 -i -pe 's/[ \t]*(-fendian=($\([^\(]*\))|[^ \t\n]*))[ \t]*//igs' ./configure.oa
+		#Add -lcairo, -lfontconfig, -lpixman-1, and -lfreetype to NCARG_LIBS
+		$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.oa
+	fi
+	$unsudo ./compile 2>&1 | $unsudo tee ./compile.log
+}
+
+if ( $build_obsgrid ); then
+	general_wrf_component_setup "OBSGRID" "$obsgrid_path" "namelist.oa" "." "obsgrid_setup" \
+	"Unable to locate the $obsgrid_path directory.  Unable compile or configure OBSGRID." \
+	"./obsgrid.exe"
+fi
 
 echo "Please confirm that all of the executables have been appropriately created in the WRFV$wrf_major_version and WPS directories."
 echo "You will still need to get boundary data for your simulations.  If you want an automated script to do this, see my WRF-Runner project at github.com/Toberumono/WRF-Runner"

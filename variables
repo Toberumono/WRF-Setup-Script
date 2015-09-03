@@ -3,7 +3,7 @@
 wrf_major_version="3"
 wrf_minor_version="7.1"
 
-mpich_compilers="CC=mpicc FC=mpif90" #This sets the compilers to be used when building with MPICH. [Default: "CC=mpicc FC=mpif90"]
+mpich_compilers="CC=$(which mpicc) FC=$(which mpifort)" #This sets the compilers to be used when building with MPICH. [Default: "CC=mpicc FC=mpif90"]
 
 #This can force the script to use a particular package manager.  Use with caution.
 #Accepted values: auto, apt, yum, brew. Default: auto.
@@ -12,9 +12,11 @@ force_package_manager="auto"
 
 #Toggles for optional components
 verbose=false #This will make the WRFSetup.sh script print a lot more information.  Only use it for debugging. [Default: false]
+build_obsgrid=true #This will make the WRFSetup.sh script attempt to compile OBSGRID. [Default: false]
 keep_namelists=true #WRF sometimes deletes namelist files during recompile or clean operations.  This backs them up and restores them. [Default: true]
 use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
 use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
+use_obsgrid_regex_fixes=true #If true, this script will automatically repair the configure.oa file via a few perl regex scripts [Default: true]
 force_extract_tars=false #If true, the script always extracts every tarball, regardless if they already have been extracted [Default: false]
 lazy_recompile=true #Don't recompile already compiled libs [Default: true]
 
@@ -29,3 +31,4 @@ wrf_version=$wrf_major_version.$wrf_minor_version
 wrf_path="WRFV$wrf_major_version"
 wrf_chem_path="$wrf_path/chem"
 wps_path="WPS"
+obsgrid_path="OBSGRID"
