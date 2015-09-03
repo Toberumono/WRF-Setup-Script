@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+script_path="$(pwd)"
 #Grab variables
 . variables
 fet=$force_extract_tars #for convenience
@@ -11,6 +12,15 @@ for param in "$@"; do
 		retried=true
 	fi
 done
+if [ "${#BASH_VERSINFO[@]}" -gt "0" ]; then
+	[ "${BASH_VERSINFO[0]}" -lt "4" ] && bash_upgrade
+else
+	echo "Unable to determine Bash version.  We are almost certainly not running in Bash."
+	read -p "This is unsupported. [Press Enter to continue, any other key to quit] " yn
+	[ "$yn" != "" ] && echo "" && exit 1 || echo "Continuing."
+	unset yn
+fi
+
 ( $verbose ) && brew="brew -v" || brew="brew" #Make brew verbose as needed
 
 #Get the command to use when grabbing subscripts from GitHub.
@@ -19,6 +29,15 @@ done
 #Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
 . <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
 if [ "$(echo $profile)" == "" ]; then
+	bash_upgrade
+fi
+. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/unsudo.sh")
+
+########################################################################
+#####                       Support Functions                      #####
+########################################################################
+
+bash_upgrade() {
 	if ( $retried ); then
 		echo "Unable to fix the shell.  Please install Bash version 4.3+ and ensure that it is in your path."
 		exit 1
@@ -41,12 +60,7 @@ if [ "$(echo $profile)" == "" ]; then
 		echo "Unable to fix this without Homebrew.  Please install Homebrew or install Bash version 4.3+ manually."
 		exit 1
 	fi
-fi
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/unsudo.sh")
-
-########################################################################
-#####                       Support Functions                      #####
-########################################################################
+}
 
 #echos 1 if the directory exists and has files in it
 unpacked_test() {
@@ -153,8 +167,7 @@ elif [ "$use_pm" == "brew" ]; then
 	$unsudo $brew install brew-cask
 	$unsudo $brew cask install ncar-ncl
 	ncl_current="$(brew --prefix)/ncl-current"
-	[ -e "$ncl_current" ] && rm "$ncl_current"
-	ncl_cask="$(ls -td -1 $(brew --prefix)/ncl-* | head -1)"
+	ncl_cask="$(ls -td1 $(brew --prefix)/ncl-* | grep -E '([0-9]+\.)*[0-9]+' | sort -g)"
 	ln -sf "$ncl_cask" "$ncl_current"
 	bash <($pull_command https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/ncl-ncarg/brewed_path_fix.sh)
 	source "$profile"
@@ -225,17 +238,54 @@ else #Add the environment variables to $unsudo
 	unsudo=$unsudo" WRFIO_NCD_LARGE_FILE_SUPPORT=1 NETCDF=$netcdf_prefix $mpich_compilers"
 fi
 
-#Configure and Compile
-yn="y"
-if [ -e "$wrf_path/run/wrf.exe" ]; then #Test for the executables that will always be built
-	read -p "WRF has already been compiled. Would you like to recompile it? [y/N] " yn
-	yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]') #Convert the user's response to lowercase and keep only the first letter.  This way, yes and no will also work.
-fi
-if [ "$yn" == "y" ]; then
-	cd $wrf_path #Starting WRF
+#Takes the following arguments: module name, path to unpacked files, name of the namelist file, path to the namelist file relative to the path to unpacked files
+#function to call with module-specific commands (should configure and compile the module as well as perform any other steps unique to the module)
+#message to display if the unpacked files cannot be located
+#paths to the built executables relative to the unpacked files. (This is used to test for whether the module is already compiled)
+general_wrf_component_setup() {
+	local mod_name="$1" && shift
+	local mod_path="$1" && shift
+	local nl_name="$1" && shift
+	local nl_path="$1" && shift
+	local function_call="$1" && shift
+	local locate_error_message="$1" && shift
 
-	#Back up namelist.input
-	( $keep_namelists ) && ( backup_restore_namelist "namelist.input" "back up" "./run" ) || echo "Skipping backing up the WRF Namelist file."
+	if [ ! -e "$mod_path" ] || [ ! -d "$mod_path" ]; then
+		echo "$locate_error_message"
+		return 1
+	fi
+
+	cd "$mod_path"
+
+	local built=false
+	if [ "$#" -gt "0" ]; then
+		built=true
+		for file in "$@"; do
+			[ ! -e "$file" ] && built=false
+		done
+	fi
+
+	local yn="y"
+	if ( $built ); then #Test for the executables that will always be built
+		read -p "$mod_name has already been compiled. Would you like to recompile it? [y/N] " yn
+		yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]') #Convert the user's response to lowercase and keep only the first letter.  This way, yes and no will also work.
+	fi
+	if [ "$yn" == "y" ]; then
+		#Back up namelist.input
+		( $keep_namelists ) && ( backup_restore_namelist "$nl_name" "back up" "$nl_path" ) || echo "Skipping backing up the $mod_name Namelist file."
+
+		$function_call
+
+		#Restore namelist.input
+		( $keep_namelists ) && ( backup_restore_namelist "$nl_name" "restore" "$nl_path" ) || echo "Skipping restoring the $mod_name Namelist file."
+	else
+		echo "Skipping reconfiguring and recompiling $mod_name."
+	fi
+	cd "$script_path"
+}
+
+#Configure and Compile
+wrf_setup() {
 	$unsudo ./configure 2>&1 | $unsudo tee ./configure.log #Configure WRF, and output to both a log file and the terminal.
 
 	#Run the WRF regex fixes if they are enabled in 'variables'
@@ -246,32 +296,19 @@ if [ "$yn" == "y" ]; then
 	$unsudo ./compile #Calling compile without arguments causes a list of valid test cases and such to be printed to the terminal.
 
 	echo "Please enter the test case you would like to run (this can include the '-j n' part) or wrf [Default: wrf]:"
+	local test_case=""
+	local b="wrf"
 	read test_case
 	test_case=$(echo "$test_case" | tr '[:upper:]' '[:lower:]')
-	[ "$test_case" == "" ] && b="wrf" || b="$test_case"
+	[ "$test_case" != "" ] && b="$test_case"
 	$unsudo ./compile "$b" 2>&1 | $unsudo tee ./compile_"$b".log
-	
-	#Restore namelist.input
-	( $keep_namelists ) && ( backup_restore_namelist "namelist.input" "restore" "./run" ) || echo "Skipping restoring the WRF Namelist file."
+}
 
-	cd ../ #Finished WRF
-elif [ ! -e "$wrf_path" ] || [ ! -d "$wrf_path" ]; then
-	echo "Unable to locate the $wrf_path directory.  Unable compile or configure WRF.  This will likely cause WPS to fail."
-else
-	echo "Skipping reconfiguring and recompiling WRF."
-fi
+general_wrf_component_setup "WRF" "$wrf_path" "namelist.input" "./run" "wrf_setup" \
+"Unable to locate the $wrf_path directory.  Unable compile or configure WRF.  This will likely cause WPS to fail." \
+"./run/wrf.exe"
 
-yn="y"
-if [ -e "$wps_path/geogrid.exe" ] && [ -e "$wps_path/metgrid.exe" ] && [ -e "$wps_path/ungrib.exe" ]; then #Test for the executables that will always be built
-	read -p "WPS has already been compiled. Would you like to recompile it? [y/N] " yn
-	yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]') #Convert the user's response to lowercase and keep only the first letter.  This way, yes and no will also work.
-fi
-if [ "$yn" == "y" ]; then
-	cd $wps_path #Starting WPS
-
-	#Back up namelist.wps
-	( $keep_namelists ) && ( backup_restore_namelist "namelist.wps" "back up" ) || echo "Skipping backing up the WPS Namelist file."
-
+wps_setup() {
 	$unsudo ./configure #2>&1 | $unsudo tee ./configure.log #The WPS configure does something that messes with logging, so this is disabled for now.
 	echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
 	echo "However, this script fixes those problems, so... No need to worry about it."
@@ -287,16 +324,11 @@ if [ "$yn" == "y" ]; then
 	fi
 	$unsudo ./compile 2>&1 | $unsudo tee ./compile.log
 	$unsudo ./compile plotgrids 2>&1 | $unsudo tee ./compile_plotgrids.log
+}
 
-	#Restore namelist.wps
-	( $keep_namelists ) && ( backup_restore_namelist "namelist.wps" "restore" ) || echo "Skipping restoring the WPS Namelist file."
-
-	cd ../ #Finished WPS
-elif [ ! -e "$wps_path" ] || [ ! -d "$wps_path" ]; then
-	echo "Unable to locate the $wps_path directory.  Unable compile or configure WPS."
-else
-	echo "Skipping reconfiguring and recompiling WPS."
-fi
+general_wrf_component_setup "WPS" "$wps_path" "namelist.wps" "." "wps_setup" \
+"Unable to locate the $wps_path directory.  Unable compile or configure WPS." \
+"./geogrid.exe" "./metgrid.exe" "./ungrib.exe"
 
 echo "Please confirm that all of the executables have been appropriately created in the WRFV$wrf_major_version and WPS directories."
 echo "You will still need to get boundary data for your simulations.  If you want an automated script to do this, see my WRF-Runner project at github.com/Toberumono/WRF-Runner"
