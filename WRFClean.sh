@@ -84,15 +84,15 @@ fi
 
 set -o nounset
 
-#Takes path to directory, name of namelist file, path to folder with namelist file relative to directory (without a trailing '/')
+#Takes: name of module, path to directory, name of namelist file, path to folder with namelist file relative to directory (without a trailing '/')
 clean_wrf() {
-	if [ ! -e "$1" ]; then
-		echo "Could not find $1.  Skipping."
+	if [ ! -e "$2" ]; then
+		echo "Could not find $2.  Skipping."
 	else
-		cd "$1"
-		[ "$#" -gt "2" ] && [ "$3" != "" ] && local np="$3" || local np="."
-		if ( $keep_namelists ) && [ -e "$np/$2" ]; then
-			$unsudo cp "$np/$2" "$backup_dir/$2.back"
+		cd "$2"
+		[ "$#" -gt "3" ] && [ "$4" != "" ] && local np="$4" || local np="."
+		if ( $keep_namelists ) && [ -e "$np/$3" ]; then
+			$unsudo cp "$np/$3" "$backup_dir/$1.namelist.back"
 		fi
 		( $use_a ) && $unsudo ./clean -a || $unsudo ./clean
 		cd ../
@@ -100,9 +100,9 @@ clean_wrf() {
 }
 
 if ( $clean_wrf ); then
-	clean_wrf "$wrf_path" "namelist.input" "./run"
+	clean_wrf "WRF" "$wrf_path" "namelist.input" "./run"
 fi
 
 if ( $clean_wps ); then
-	clean_wrf "$wps_path" "namelist.wps"
+	clean_wrf "WPS" "$wps_path" "namelist.wps"
 fi

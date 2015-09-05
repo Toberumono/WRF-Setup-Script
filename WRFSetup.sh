@@ -64,7 +64,7 @@ bash_upgrade() {
 
 #echos 1 if the directory exists and has files in it
 unpacked_test() {
-	[ -d "$1" ] && [ "$(ls -A $1)" != "" ] && echo "1" || echo "0"
+	[ -d "$1" ] && [ "$(ls $1)" != "" ] && echo "1" || echo "0"
 }
 
 #Takes folder to test, tarball name, tar parameters, should it add '../' to the test path for the -C component
@@ -90,13 +90,14 @@ unpack_fail() {
 	unset yn
 }
 
-#name of namelist file, is it a backup or a restore (must equal "back up" or "restore"), path to folder with namelist file relative to directory (without a trailing '/') (optional)
+#name of the component, name of namelist file, is it a backup or a restore (must equal "back up" or "restore"), path to folder with namelist file relative to directory (without a trailing '/') (optional)
 backup_restore_namelist() {
-	[ "$#" -gt "2" ] && [ "$3" != "" ] && local np="$3" || local np="."
-	if [ -e "$np/$1" ]; then
-		[ "$2" == "back up" ] && $unsudo cp "$np/$1" "$backup_dir/$1.back" || $unsudo cp "$backup_dir/$1.back" "$np/$1"
+	[ "$#" -gt "3" ] && [ "$4" != "" ] && local np="$4" || local np="."
+	if [ -e "$np/$2" ]; then
+		local backup_name="$backup_dir/$1.namelist.back"
+		[ "$3" == "back up" ] && $unsudo cp "$np/$2" "$backup_name" || $unsudo cp "$backup_name" "$np/$2"
 	else
-		echo "No $1 to $2."
+		echo "No $2 to $3."
 	fi
 }
 
@@ -278,13 +279,13 @@ general_wrf_component_setup() {
 		yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]') #Convert the user's response to lowercase and keep only the first letter.  This way, yes and no will also work.
 	fi
 	if [ "$yn" == "y" ]; then
-		#Back up namelist.input
-		( $keep_namelists ) && ( backup_restore_namelist "$nl_name" "back up" "$nl_path" ) || echo "Skipping backing up the $mod_name Namelist file."
+		#Back up namelist
+		( $keep_namelists ) && ( backup_restore_namelist "$mod_name" "$nl_name" "back up" "$nl_path" ) || echo "Skipping backing up the $mod_name Namelist file."
 
 		$function_call
 
-		#Restore namelist.input
-		( $keep_namelists ) && ( backup_restore_namelist "$nl_name" "restore" "$nl_path" ) || echo "Skipping restoring the $mod_name Namelist file."
+		#Restore namelist
+		( $keep_namelists ) && ( backup_restore_namelist "$mod_name" "$nl_name" "restore" "$nl_path" ) || echo "Skipping restoring the $mod_name Namelist file."
 	else
 		echo "Skipping reconfiguring and recompiling $mod_name."
 	fi

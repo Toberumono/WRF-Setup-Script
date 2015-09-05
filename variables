@@ -12,7 +12,7 @@ force_package_manager="auto"
 
 #Toggles for optional components
 verbose=false #This will make the WRFSetup.sh script print a lot more information.  Only use it for debugging. [Default: false]
-build_obsgrid=true #This will make the WRFSetup.sh script attempt to compile OBSGRID. [Default: false]
+build_obsgrid=false #This will make the WRFSetup.sh script attempt to compile OBSGRID. [Default: false]
 keep_namelists=true #WRF sometimes deletes namelist files during recompile or clean operations.  This backs them up and restores them. [Default: true]
 use_wrf_regex_fixes=true #If true, this script will automatically repair the configure.wrf file via a few perl regex scripts [Default: true]
 use_wps_regex_fixes=true #If true, this script will automatically repair the configure.wps file via a few perl regex scripts [Default: true]
