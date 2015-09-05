@@ -1,8 +1,8 @@
-# <a name="Readme"></a><a name="readme"></a>WRF Setup Script
-## <a name="wii"></a>What is it?
+#WRF Setup Script
+##What is it?
 This is a pair of scripts that automate the process of configuring a computer to run a WRF model and automate the process of cleaning a WRF and WPS installation in order to change how they are built.
 
-## <a name="wdtsd"></a>What do these scripts do?
+##What do these scripts do?
 
 + WRFSetup.sh
 	- Installs the libraries that WRF requires (this requires sudo on Linux).
@@ -13,7 +13,7 @@ This is a pair of scripts that automate the process of configuring a computer to
 	- Cleans WRF and WPS installations.
 	- Backs up namelist.input and namelist.wps files so that the WRFSetup.sh script can restore them.
 
-## <a name="wdtsnd"></a>What do these scripts not do?
+##What do these scripts not do?
 * Both
 	+ Do not run on Windows.  They are Bash scripts, and therefore run on Linux and OSX *only*.<br>
 	Furthermore, they assume gcc/gfortran compilers.
@@ -24,28 +24,28 @@ This is a pair of scripts that automate the process of configuring a computer to
 * WRFClean.sh
 	+ Does not uninstall the libraries and support programs that were installed by WRFSetup.sh - that is far too risky because some of them are almost certainly used by other programs.
 
-## <a name-"wsiut"></a>Why should I use this?
+##Why should I use this?
 
 * Manually setting up WRF and WPS requires setting a decent number of environment variables and executing commands that may not be familiar to an average user.
 	- Both of these can be intimidating, and some of them require information that can be difficult for a user to look up, but trivial for a script to find.
 * Setting up WRF and WPS entails a decent amount of trial and error to figure out which configuration works best for you.
 	- These scripts automatically back up the important configuration files so that you don't have to worry about it.
 
-## <a name="wloediniotuts"></a>What level of experience do I need in order to use this script?
+##What level of experience do I need in order to use this script?
 This guide does assume a basic level of comfort with a UNIX-based prompt. If you are new to working with Terminal, tutorial one at [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/) will cover everything you need for this tutorial. (Its prompt likely looks a bit different, but those commands are effectively identical across UNIX shells)
 
-## Okay, how do I use this?
+##Okay, how do I use this?
 
-1. Scroll down to the [Usage](#Usage) section.
+1. Scroll down to the [Usage](#usage) section.
 
-## <a name="Usage"></a><a name="usage"></a>Usage
-### A few notes
+##Usage
+###A few notes
 
 1. This script must be run in the same directory as the downloaded WRF, WPS, WRF-Chem, and GEOGRID tarballs.
 2. The path to the downloaded files *cannot* contain *any* spaces - WRF will not compile if the path has spaces.
 3. This script uses [Homebrew](http://brew.sh) on Macs and either Apt or [Linuxbrew](https://github.com/Homebrew/linuxbrew) on Linux.
 
-### Permissions Needed
+###Permissions Needed
 
 + Mac OSX
 	+ `WRFSetup.sh`
@@ -60,7 +60,7 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 	+ `WRFClean.sh`
 		- This script only interacts with WRF and WPS, and does not, therefore, require sudo.
 
-### Preparation
+###Preparation
 
 1. On Mac, install [Homebrew](http://brew.sh).
 2. If your system does not have Git (run `which git` in Terminal, if a path shows up, your system has Git), run:
@@ -79,10 +79,10 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 6. Move the downloaded tar files into the directory containing the scripts.
 7. As of this writing, WRF Version 3.7.1 is the latest stable release.  You may need to change the version numbers in the variables file to match the version that you downloaded.
 
-### Running the script
+###Running the Script
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
 2. Run `sudo ./WRFSetup.sh` if you have sudo privileges and are not certain that all of the required support software and libraries have been installed and you are not using [Homebrew](http://brew.sh).
 	+ Depending on how many libraries need to be installed, this could take a *long* time.
-	+ If you have not already installed gcc/gfortran on your system, this will take a *very long* time and will likely look like it is hanging.  Give it time (sometimes over an hour), and it will complete.
+	+ If you have not already installed gcc/gfortran on your system, this can take a *very long* time and will likely look like it is hanging.  Give it time (sometimes over an hour), and it will complete.
 	+ There may be multiple warnings about things already being tapped or installed.  This is normal - it just means that 'brew has detected that some of the requirements were already installed.
 3. In subsequent runs, the script can be run without sudo regardless of operating system.
