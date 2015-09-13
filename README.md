@@ -72,7 +72,7 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 4. In Terminal, cd into that directory and run:
 
   ```bash
-  git clone -b "$(git ls-remote --tags https://github.com/Toberumono/WRF-Setup-Script.git | grep -o -E '([0-9]+\.)*[0-9]+$' | sort -g | tail -1)" --depth=1 "https://github.com/Toberumono/WRF-Setup-Script.git" .
+  wget -O - https://github.com/Toberumono/WRF-Setup-Script/archive/$(git ls-remote --tags https://github.com/Toberumono/WRF-Setup-Script.git | grep -oE '([0-9]+\.)*[0-9]+$' | sort -g | tail -1).tar.gz | tar -xz --strip-components 1 -C .
   ```
   + This command grabs the latest tagged version of the scripts from GitHub and downloads them into the newly-created directory.
 5. Download the tarballs (tar files) for WRF-ARW, WPS, WRF-Chem and the WPS GEOGRID data (Available from the UCAR website, [http://www2.mmm.ucar.edu/wrf/users/download/get_source.html](http://www2.mmm.ucar.edu/wrf/users/download/get_source.html)).
