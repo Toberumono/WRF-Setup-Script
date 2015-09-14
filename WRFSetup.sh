@@ -62,6 +62,18 @@ bash_upgrade() {
 	fi
 }
 
+#Echoes the name of the tap if it was not already tapped
+brew_tap() {
+	if [ "$#" -gt "1" ]; then
+		local tapped="$1"
+		local tap="$2"
+	else
+		local tapped="$(brew tap)"
+		local tap="$1"
+	fi
+	[ "$(echo $tapped | grep -F $tap)" == "" ] && $unsudo $brew tap "$tap" && echo "$tap"
+}
+
 #echos 1 if the directory exists and has files in it
 unpacked_test() {
 	[ -d "$1" ] && [ "$(ls $1)" != "" ] && echo "1" || echo "0"
@@ -151,14 +163,18 @@ elif [ "$use_pm" == "yum" ]; then
 	fi
 elif [ "$use_pm" == "brew" ]; then
 	echo "Using brew."
+	echo "Checking for upgradeable packages."
+	$unsudo $brew update && $unsudo $brew upgrade
 	fortran_flag=""
 	installation="pv ncurses cairo libpng szip lzlib pixman doxygen mpich --build-from-source tcsh hdf5 jasper"
+	#Tap stuff
+	taps="$(brew tap)"
+	brew_tap "$taps" 'homebrew/science'
+	brew_tap "$taps" 'homebrew/dupes'
+	brew_tap "$taps" 'caskroom/cask'
 	#Install prep software
 	[ "$(which git)" == "" ] && $unsudo $brew install "git"		|| echo "Found git"
 	[ "$(which wget)" == "" ] && $unsudo $brew install "wget"	|| echo "Found wget"
-	$unsudo $brew tap homebrew/science
-	$unsudo $brew tap homebrew/dupes
-	$unsudo $brew tap caskroom/cask
 	#If any of gcc, g++, or gfortran is not installed, install one via Homebrew.
 	if [ "$(which gcc)" == "" ] || [ "$(which gfortran)" == "" ] || [ "$(which g++)" == "" ]; then
 		($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/brew_gcc.sh") | $unsudo bash
