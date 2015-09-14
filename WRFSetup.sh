@@ -152,7 +152,7 @@ elif [ "$use_pm" == "yum" ]; then
 elif [ "$use_pm" == "brew" ]; then
 	echo "Using brew."
 	fortran_flag=""
-	installation="pv ncurses cairo libpng szip lzlib pixman doxygen mpich2 --build-from-source tcsh hdf5 jasper"
+	installation="pv ncurses cairo libpng szip lzlib pixman doxygen mpich --build-from-source tcsh hdf5 jasper"
 	#Install prep software
 	[ "$(which git)" == "" ] && $unsudo $brew install "git"		|| echo "Found git"
 	[ "$(which wget)" == "" ] && $unsudo $brew install "wget"	|| echo "Found wget"
