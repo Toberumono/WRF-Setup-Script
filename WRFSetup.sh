@@ -12,30 +12,6 @@ for param in "$@"; do
 		retried=true
 	fi
 done
-if [ "${#BASH_VERSINFO[@]}" -gt "0" ]; then
-	[ "${BASH_VERSINFO[0]}" -lt "4" ] && bash_upgrade
-else
-	echo "Unable to determine Bash version.  We are almost certainly not running in Bash."
-	read -p "This is unsupported. [Press Enter to continue, any other key to quit] " yn
-	[ "$yn" != "" ] && echo "" && exit 1 || echo "Continuing."
-	unset yn
-fi
-
-( $verbose ) && brew="brew -v" || brew="brew" #Make brew verbose as needed
-
-#Get the command to use when grabbing subscripts from GitHub.
-[ "$(which wget)" == "" ] && pull_command="curl -#fSL" || pull_command="wget --show-progress -qO -"
-
-#Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
-if [ "$(echo $profile)" == "" ]; then
-	bash_upgrade
-fi
-. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/unsudo.sh")
-
-########################################################################
-#####                       Support Functions                      #####
-########################################################################
 
 bash_upgrade() {
 	if ( $retried ); then
@@ -61,6 +37,31 @@ bash_upgrade() {
 		exit 1
 	fi
 }
+
+if [ "${#BASH_VERSINFO[@]}" -gt "0" ]; then
+	[ "${BASH_VERSINFO[0]}" -lt "4" ] && bash_upgrade
+else
+	echo "Unable to determine Bash version.  We are almost certainly not running in Bash."
+	read -p "This is unsupported. [Press Enter to continue, any other key to quit] " yn
+	[ "$yn" != "" ] && echo "" && exit 1 || echo "Continuing."
+	unset yn
+fi
+
+( $verbose ) && brew="brew -v" || brew="brew" #Make brew verbose as needed
+
+#Get the command to use when grabbing subscripts from GitHub.
+[ "$(which wget)" == "" ] && pull_command="curl -#fSL" || pull_command="wget --show-progress -qO -"
+
+#Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
+. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
+if [ "$(echo $profile)" == "" ]; then
+	bash_upgrade
+fi
+. <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/unsudo.sh")
+
+########################################################################
+#####                       Support Functions                      #####
+########################################################################
 
 #Echoes the name of the tap if it was not already tapped
 brew_tap() {
