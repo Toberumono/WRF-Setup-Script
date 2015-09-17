@@ -79,11 +79,12 @@ brew_tap() {
 }
 
 brew_clean() {
-	cmd=$unsudo $brew uninstall --force
+	cmd="$unsudo $brew reinstall"
 	for var in "$@"; do
-		cmd="$cmd $(brew list | grep -oE '$var')"
+		cmd="$cmd $(brew list | grep -oE $var)"
 	done
-	$cmd
+	[ "$(brew list | grep -oE 'mpich')" != "" ] && $unsudo $brew uninstall --force mpich
+	[ "$cmd" != "" ] && $cmd
 }
 
 #echos 1 if the directory exists and has files in it
@@ -177,9 +178,10 @@ elif [ "$use_pm" == "brew" ]; then
 	echo "Using brew."
 	echo "Checking for upgradeable packages."
 	$unsudo $brew update && $unsudo $brew upgrade
-	( $clean_brew ) && brew_clean "fontconfig freetype gcc gmp isl libmpc libpng mpfr ncurses pkg-config szip xz"
-	fortran_flag=""
-	installation="pv ncurses cairo libpng szip lzlib pixman doxygen mpich --build-from-source tcsh hdf5 jasper"
+	( $clean_brew ) && brew_clean 'cairo' 'doxygen' 'fontconfig' 'freetype' 'gettext' 'glib' 'gmp' 'hdf5' 'isl' \
+		'jasper' 'jpeg' 'libffi' 'libmpc' 'libpng' 'lzlib' 'mpfr' 'ncurses' 'netcdf' 'pixman' 'pkg-config' 'szip' 'tcsh' 'xz'
+	fortran_flag="--default-fortran-flags"
+	installation="pv ncurses cairo libpng szip lzlib pixman doxygen tcsh hdf5 jasper"
 	#Tap stuff
 	taps="$(brew tap)"
 	brew_tap "$taps" 'homebrew/science'
@@ -192,7 +194,6 @@ elif [ "$use_pm" == "brew" ]; then
 	if [ "$(which gcc)" == "" ] || [ "$(which gfortran)" == "" ] || [ "$(which g++)" == "" ]; then
 		($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/brew_gcc.sh") | $unsudo bash
 		source "$profile"
-		fortran_flag="--default-fortran-flags"
 	fi
 	$unsudo $brew install brew-cask
 	$unsudo $brew cask install ncar-ncl
@@ -204,6 +205,10 @@ elif [ "$use_pm" == "brew" ]; then
 	[ "$(which m4)" == "" ] && installation="m4 "$installation || echo "Found m4"
 	installation="$installation netcdf"' --with-fortran --with-cxx-compat'
 	$unsudo $brew install $fortran_flag $installation
+	export HOMEBREW_CC=gcc-5
+	export HOMEBREW_CXX=g++-5
+	$unsudo $brew install $fortran_flag 'mpich' '--build-from-source'
+	unset HOMEBREW_CC HOMEBREW_CXX
 else
 	echo -n "Could not find "
 	[ "$force_package_manager" != "auto" ] && echo -n "$use_pm." || echo -n "apt, yum, or brew."
@@ -321,12 +326,20 @@ general_wrf_component_setup() {
 	cd "$script_path"
 }
 
+gfortran_version="$(gfortran -dumpversion | cut -d. -f1)"
+if [ "$gfortran_version" -lt "5" ]; then
+	gfortran_version="$(gfortran -dumpversion | cut -d. -f1,2)"
+fi
+
 #Configure and Compile
 wrf_setup() {
 	$unsudo ./configure 2>&1 | $unsudo tee ./configure.log #Configure WRF, and output to both a log file and the terminal.
 
 	#Run the WRF regex fixes if they are enabled in 'variables'
 	#This just adds -lgomp to the LIB_EXTERNAL variable.
+	replacement='s/gcc/gcc-'"$gfortran_version"'/igs'
+	echo "$replacement"
+	( $use_wrf_regex_fixes ) && [ "$gfortran_version" -ge "5" ] && $unsudo perl -0777 -i -pe $replacement ./configure.wrf
 	( $use_wrf_regex_fixes ) && $unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf || echo "Skipping WRF regex fixes."
 
 	#$unsudo ./compile wrf 2>&1 | $unsudo tee ./compile_wrf.log #Compile WRF, and output to both a log file and the terminal.
@@ -350,8 +363,8 @@ wps_setup() {
 	echo "For reasons unknown, WPS's configure sometimes adds invalid command line options to DM_FC and DM_CC and neglects to add some required links to NCARG_LIBS."
 	echo "However, this script fixes those problems, so... No need to worry about it."
 	if ( $use_wps_regex_fixes ); then
-		#Remove -f90 and -cc from the configure.wps file
-		$unsudo perl -0777 -i -pe 's/[ \t]*(-f90=($\([^\(]*\))|[^ \t\n]*)|-cc=($\([^\(]*\))|[^ \t\n]*)*)[ \t]*//igs' ./configure.wps
+		#Replace gcc with gcc-5 if needed in the configure.wps file
+		( "$gfortran_version" -ge "5" ) && $unsudo perl -0777 -i -pe 's/gcc/gcc-'"$gfortran_version"'/igs' ./configure.wps
 		#Add -lcairo, -lfontconfig, -lpixman-1, and -lfreetype to NCARG_LIBS
 		$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.wps
 		#Add -lgomp to WRF_LIBS
