@@ -5,11 +5,14 @@ script_path="$(pwd)"
 fet=$force_extract_tars #for convenience
 verbose=false
 retried=false
+clean_brew=false
 for param in "$@"; do
 	if [ "$param" == "--verbose" ] || [ "$param" == "-v" ]; then
 		verbose=true
 	elif [ "$param" == "--retried" ]; then
 		retried=true
+	elif [ "$param" == "--clean-brew" ]; then
+		clean_brew=true
 	fi
 done
 
@@ -73,6 +76,14 @@ brew_tap() {
 		local tap="$1"
 	fi
 	[ "$(echo $tapped | grep -F $tap)" == "" ] && $unsudo $brew tap "$tap" && echo "$tap"
+}
+
+brew_clean() {
+	cmd=$unsudo $brew uninstall --force
+	for var in "$@"; do
+		cmd="$cmd $(brew list | grep -oE '$var')"
+	done
+	$cmd
 }
 
 #echos 1 if the directory exists and has files in it
@@ -166,6 +177,7 @@ elif [ "$use_pm" == "brew" ]; then
 	echo "Using brew."
 	echo "Checking for upgradeable packages."
 	$unsudo $brew update && $unsudo $brew upgrade
+	( $clean_brew ) && brew_clean "fontconfig freetype gcc gmp isl libmpc libpng mpfr ncurses pkg-config szip xz"
 	fortran_flag=""
 	installation="pv ncurses cairo libpng szip lzlib pixman doxygen mpich --build-from-source tcsh hdf5 jasper"
 	#Tap stuff
