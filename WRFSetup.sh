@@ -60,10 +60,10 @@ fi
 
 #Get the command to use when grabbing subscripts from GitHub.
 if [ "$(which wget)" != "" ]; then
-	wget_version="$(wget --version | grep -m 1 -oE '([0-9]+\.)*[0-9]+' | grep -m 1 -oE '^.*$')"
 	if ( $verbose ); then
 		pull_command="wget -O -"
 	else
+		wget_version="$(wget --version | grep -m 1 -oE '([0-9]+\.)*[0-9]+' | grep -m 1 -oE '^.*$')"
 		[ "$(echo $wget_version | cut -d. -f1)" -gt "1" ] || [ "$(echo $wget_version | cut -d. -f2)" -ge "16" ] && \
 			pull_command="wget --show-progress -qO -" || pull_command="wget -qO -"
 	fi
