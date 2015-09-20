@@ -61,9 +61,14 @@ fi
 #Get the command to use when grabbing subscripts from GitHub.
 if [ "$(which wget)" != "" ]; then
 	wget_version="$(wget --version | grep -m 1 -oE '([0-9]+\.)*[0-9]+' | grep -m 1 -oE '^.*$')"
-	[ "$(echo $wget_version | cut -d. -f1)" -gt "1" ] || [ "$(echo $wget_version | cut -d. -f2)" -ge "16" ] && pull_command="wget --show-progress -qO -" || pull_command="wget -qO -"
+	if ( $verbose ); then
+		pull_command="wget -O -"
+	else
+		[ "$(echo $wget_version | cut -d. -f1)" -gt "1" ] || [ "$(echo $wget_version | cut -d. -f2)" -ge "16" ] && \
+			pull_command="wget --show-progress -qO -" || pull_command="wget -qO -"
+	fi
 else
-	pull_command="curl -#fSL"
+	( $verbose ) && pull_command="curl -fL" || pull_command="curl -#fSL"
 fi
 
 #Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
