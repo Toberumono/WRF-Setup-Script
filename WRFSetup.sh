@@ -176,8 +176,6 @@ elif [ "$use_pm" == "yum" ]; then
 	fi
 elif [ "$use_pm" == "brew" ]; then
 	echo "Using brew."
-	echo "Checking for upgradeable packages."
-	$unsudo $brew update && $unsudo $brew upgrade
 	( $clean_brew ) && brew_clean 'cairo' 'doxygen' 'fontconfig' 'freetype' 'gettext' 'glib' 'gmp' 'hdf5' 'isl' \
 		'jasper' 'jpeg' 'libffi' 'libmpc' 'libpng' 'lzlib' 'mpfr' 'ncurses' 'netcdf' 'pixman' 'pkg-config' 'szip' 'tcsh' 'xz'
 	fortran_flag="--default-fortran-flags"
