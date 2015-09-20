@@ -77,7 +77,7 @@ brew_tap() {
 		local tapped="$(brew tap)"
 		local tap="$1"
 	fi
-	[ "$(echo $tapped | grep -F $tap)" == "" ] && $unsudo $brew tap "$tap" && echo "$tap"
+	[ "$(echo $tapped | grep -F $tap)" == "" ] && $unsudo $brew tap "$tap"
 }
 
 brew_clean() {
