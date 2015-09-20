@@ -13,6 +13,12 @@ for param in "$@"; do
 		retried=true
 	elif [ "$param" == "--clean-brew" ]; then
 		clean_brew=true
+	elif [ "$param" == "--help" ] || [ "$param" == "-h" ]; then
+		echo "The help documentation is available online at https://github.com/Toberumono/WRF-Setup-Script"
+		read -p "Would you like to open this page in your default browser? [Y/n]" yn
+		yn=$(echo "${yn:0:1}" | tr '[:upper:]' '[:lower:]')
+		[ "$yn" != "n" ] && open "https://github.com/Toberumono/WRF-Setup-Script#wrf-setup-script"
+		unset yn
 	fi
 done
 
@@ -85,7 +91,7 @@ brew_clean() {
 	for var in "$@"; do
 		cmd="$cmd $(brew list | grep -oE $var)"
 	done
-	[ "$(brew list | grep -oE 'mpich')" != "" ] && $unsudo $brew uninstall --force mpich
+	[ "$(brew list | grep -oE 'mpich')" != "" ] && $unsudo $brew uninstall --force mpich #mpich will be reinstalled momentarily
 	[ "$cmd" != "" ] && $cmd
 }
 
