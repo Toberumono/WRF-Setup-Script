@@ -63,13 +63,18 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 ###Preparation
 
 1. On Mac, install [Homebrew](http://brew.sh).
-2. If your system does not have Git (run `which git` in Terminal, if a path shows up, your system has Git), run:
+2. Make sure that your system is up to date:
+  + Debian Linux (e.g. Ubuntu):
+    - `sudo apt-get update && sudo apt-get upgrade`
+  + Mac OSX:
+    - `brew update && brew upgrade`
+3. If your system does not have Git (run `which git` in Terminal, if a path shows up, your system has Git), run:
   + Debian Linux (e.g. Ubuntu):
     - `sudo apt-get install git`
   + Mac OSX
     - `brew install git`
-3. Create an empty directory.
-4. In Terminal, cd into that directory and run:
+4. Create an empty directory.
+5. In Terminal, cd into that directory and run:
 
   ```bash
   wget -O - https://github.com/Toberumono/WRF-Setup-Script/archive/$(git ls-remote --tags https://github.com/Toberumono/WRF-Setup-Script.git | grep -oE '([0-9]+\.)*[0-9]+$' | sort -g | tail -1).tar.gz | tar -xz --strip-components 1 -C .
