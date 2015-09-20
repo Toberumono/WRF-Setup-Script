@@ -53,13 +53,15 @@ fi
 ( $verbose ) && brew="brew -v" || brew="brew" #Make brew verbose as needed
 
 #Get the command to use when grabbing subscripts from GitHub.
-[ "$(which wget)" == "" ] && pull_command="curl -#fSL" || pull_command="wget --show-progress -qO -"
+if [ "$(which wget)" != "" ]; then
+	wget_version="$(wget --version | grep -m 1 -oE '([0-9]+\.)*[0-9]+' | grep -m 1 -oE '^.*$')"
+	[ "$(echo $wget_version | cut -d. -f1)" -gt "1" ] || [ "$(echo $wget_version | cut -d. -f2)" -ge "16" ] && pull_command="wget --show-progress -qO -" || pull_command="wget -qO -"
+else
+	pull_command="curl -#fSL"
+fi
 
 #Download the get_profile.sh and unsudo.sh scripts from my repo and run their contents within the current shell via an anonymous file descriptor.
 . <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/get_profile.sh")
-if [ "$(echo $profile)" == "" ]; then
-	bash_upgrade
-fi
 . <($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/unsudo.sh")
 
 ########################################################################
@@ -325,6 +327,7 @@ general_wrf_component_setup() {
 }
 
 gfortran_version="$(gfortran -dumpversion | cut -d. -f1)"
+gfortran_major_version="$gfortran_version"
 if [ "$gfortran_version" -lt "5" ]; then
 	gfortran_version="$(gfortran -dumpversion | cut -d. -f1,2)"
 fi
@@ -336,8 +339,7 @@ wrf_setup() {
 	#Run the WRF regex fixes if they are enabled in 'variables'
 	#This just adds -lgomp to the LIB_EXTERNAL variable.
 	replacement='s/gcc/gcc-'"$gfortran_version"'/igs'
-	echo "$replacement"
-	( $use_wrf_regex_fixes ) && [ "$gfortran_version" -ge "5" ] && $unsudo perl -0777 -i -pe $replacement ./configure.wrf
+	( $use_wrf_regex_fixes ) && [ "$gfortran_major_version" -ge "5" ] && $unsudo perl -0777 -i -pe $replacement ./configure.wrf
 	( $use_wrf_regex_fixes ) && $unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf || echo "Skipping WRF regex fixes."
 
 	#$unsudo ./compile wrf 2>&1 | $unsudo tee ./compile_wrf.log #Compile WRF, and output to both a log file and the terminal.
@@ -362,7 +364,7 @@ wps_setup() {
 	echo "However, this script fixes those problems, so... No need to worry about it."
 	if ( $use_wps_regex_fixes ); then
 		#Replace gcc with gcc-5 if needed in the configure.wps file
-		( "$gfortran_version" -ge "5" ) && $unsudo perl -0777 -i -pe 's/gcc/gcc-'"$gfortran_version"'/igs' ./configure.wps
+		( "$gfortran_major_version" -ge "5" ) && $unsudo perl -0777 -i -pe 's/gcc/gcc-'"$gfortran_version"'/igs' ./configure.wps
 		#Add -lcairo, -lfontconfig, -lpixman-1, and -lfreetype to NCARG_LIBS
 		$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.wps
 		#Add -lgomp to WRF_LIBS
