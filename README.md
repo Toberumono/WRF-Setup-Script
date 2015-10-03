@@ -2,6 +2,10 @@
 ##What is it?
 This is a pair of scripts that automate the process of configuring a computer to run a WRF model and automate the process of cleaning a WRF and WPS installation in order to change how they are built.
 
+For more detailed information on what exactly this is and how to use it, see its wiki at [https://github.com/Toberumono/WRF-Setup-Script/wiki](https://github.com/Toberumono/WRF-Setup-Script/wiki)
+
+------------------------------
+
 ##What do these scripts do?
 
 + WRFSetup.sh
