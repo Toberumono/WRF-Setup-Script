@@ -6,6 +6,7 @@ fet=$force_extract_tars #for convenience
 verbose=false
 retried=false
 clean_brew=false
+split_fortran=""
 for param in "$@"; do
 	if [ "$param" == "--verbose" ] || [ "$param" == "-v" ]; then
 		verbose=true
@@ -175,6 +176,8 @@ if [ "$use_pm" == "apt" ]; then
 	else
 		installation="build-essential pv gcc gfortran git wget curl libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev"
 		installation=$installation" libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
+		[ "$(apt list libnetcdff-dev | grep 'libnetcdff-dev')" == "" ] || (split_fortran=" -lnetcdff" && installation=$installation" libnetcdff-dev")
+		[ "$(apt list libnetcdff-dev | grep 'libnetcdff-dev')" == "" ] || installation=$installation" libnetcdff-dev"
 		apt-get install $installation
 	fi
 elif [ "$use_pm" == "yum" ]; then
@@ -351,7 +354,7 @@ wrf_setup() {
 	#This just adds -lgomp to the LIB_EXTERNAL variable.
 	replacement='s/gcc/gcc-'"$gfortran_version"'/igs'
 	( $use_wrf_regex_fixes ) && [ "$gfortran_major_version" -ge "5" ] && $unsudo perl -0777 -i -pe $replacement ./configure.wrf
-	( $use_wrf_regex_fixes ) && $unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wrf || echo "Skipping WRF regex fixes."
+	( $use_wrf_regex_fixes ) && $unsudo perl -0777 -i -pe 's/(LIB_EXTERNAL[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1'"$split_fortran"' -lgomp\n/is' ./configure.wrf || echo "Skipping WRF regex fixes."
 
 	#$unsudo ./compile wrf 2>&1 | $unsudo tee ./compile_wrf.log #Compile WRF, and output to both a log file and the terminal.
 	$unsudo ./compile #Calling compile without arguments causes a list of valid test cases and such to be printed to the terminal.
@@ -379,7 +382,7 @@ wps_setup() {
 		#Add -lcairo, -lfontconfig, -lpixman-1, and -lfreetype to NCARG_LIBS
 		$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.wps
 		#Add -lgomp to WRF_LIBS
-		$unsudo perl -0777 -i -pe 's/(WRF_LIB[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lgomp\n/is' ./configure.wps
+		$unsudo perl -0777 -i -pe 's/(WRF_LIB[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1'"$split_fortran"' -lgomp\n/is' ./configure.wps
 	else
 		echo "Skipping WPS regex fixes."
 	fi
