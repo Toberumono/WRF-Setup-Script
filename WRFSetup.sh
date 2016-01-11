@@ -176,8 +176,7 @@ if [ "$use_pm" == "apt" ]; then
 	else
 		installation="build-essential pv gcc gfortran git wget curl libjasper-dev jasper zlib1g zlib1g-dev libncarg0 libpng12-0 libpng12-dev libx11-dev"
 		installation=$installation" libcairo2-dev libpixman-1-dev csh m4 doxygen libhdf5-dev libnetcdf-dev netcdf-bin ncl-ncarg mpich"
-		[ "$(apt list libnetcdff-dev | grep 'libnetcdff-dev')" == "" ] || (split_fortran=" -lnetcdff" && installation=$installation" libnetcdff-dev")
-		[ "$(apt list libnetcdff-dev | grep 'libnetcdff-dev')" == "" ] || installation=$installation" libnetcdff-dev"
+		[ "$(cat <(apt show libnetcdff-dev))" == "" ] || (split_fortran=" -lnetcdff" && installation=$installation" libnetcdff-dev")
 		apt-get install $installation
 	fi
 elif [ "$use_pm" == "yum" ]; then
