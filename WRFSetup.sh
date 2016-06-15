@@ -211,7 +211,6 @@ elif [ "$use_pm" == "brew" ]; then
 		($pull_command "https://raw.githubusercontent.com/Toberumono/Miscellaneous/master/common/brew_gcc.sh") | $unsudo bash
 		source "$profile"
 	fi
-	$unsudo $brew install brew-cask
 	$unsudo $brew cask install ncar-ncl
 	ncl_current="$(brew --prefix)/ncl-current"
 	ncl_cask="$(ls -td1 $(brew --prefix)/ncl-* | grep -E '([0-9]+\.)*[0-9]+' | sort -g)"
@@ -221,8 +220,8 @@ elif [ "$use_pm" == "brew" ]; then
 	[ "$(which m4)" == "" ] && installation="m4 "$installation || echo "Found m4"
 	installation="$installation netcdf"' --with-fortran --with-cxx-compat'
 	$unsudo $brew install $fortran_flag $installation
-	export HOMEBREW_CC=gcc-5
-	export HOMEBREW_CXX=g++-5
+	export HOMEBREW_CC=gcc-6
+	export HOMEBREW_CXX=g++-6
 	$unsudo $brew install $fortran_flag 'mpich' '--build-from-source'
 	unset HOMEBREW_CC HOMEBREW_CXX
 else
@@ -380,7 +379,7 @@ wps_setup() {
 	echo "However, this script fixes those problems, so... No need to worry about it."
 	if ( $use_wps_regex_fixes ); then
 		#Replace gcc with gcc-5 if needed in the configure.wps file
-		( "$gfortran_major_version" -ge "5" ) && $unsudo perl -0777 -i -pe 's/gcc/gcc-'"$gfortran_version"'/igs' ./configure.wps
+		[ "$gfortran_major_version" -ge "5" ] && $unsudo perl -0777 -i -pe 's/gcc/gcc-'"$gfortran_version"'/igs' ./configure.wps
 		#Add -lcairo, -lfontconfig, -lpixman-1, and -lfreetype to NCARG_LIBS
 		$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.wps
 		#Add -lgomp to WRF_LIBS
