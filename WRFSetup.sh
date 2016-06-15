@@ -48,6 +48,8 @@ bash_upgrade() {
 	fi
 }
 
+( $verbose ) && brew="brew -v" || brew="brew" #Make brew verbose as needed
+
 if [ "${#BASH_VERSINFO[@]}" -gt "0" ]; then
 	[ "${BASH_VERSINFO[0]}" -lt "4" ] && bash_upgrade
 else
@@ -56,8 +58,6 @@ else
 	[ "$yn" != "" ] && echo "" && exit 1 || echo "Continuing."
 	unset yn
 fi
-
-( $verbose ) && brew="brew -v" || brew="brew" #Make brew verbose as needed
 
 #Get the command to use when grabbing subscripts from GitHub.
 if [ "$(which wget)" != "" ]; then
