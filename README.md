@@ -90,7 +90,7 @@ This guide does assume a basic level of comfort with a UNIX-based prompt. If you
 
 ###Running the Script
 1. In terminal, cd into the directory into which you downloaded the script and tarballs.
-2. Run `sudo ./WRFSetup.sh` if you have sudo privileges and are not certain that all of the required support software and libraries have been installed and you are not using [Homebrew](http://brew.sh).
+2. Run `sudo ./WRFSetup.sh` if you have sudo privileges and are not certain that all of the required support software and libraries have been installed and you are not using [Homebrew](http://brew.sh).  Otherwise, run `./WRFSetup.sh` (without sudo).
   + Depending on how many libraries need to be installed, this could take a *long* time.
   + If you have not already installed gcc/gfortran on your system, this can take a *very long* time and will likely look like it is hanging.  Give it time (sometimes over an hour), and it will complete.
   + There may be multiple warnings about things already being tapped or installed.  This is normal - it just means that 'brew has detected that some of the requirements were already installed.
