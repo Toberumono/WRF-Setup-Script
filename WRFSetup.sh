@@ -380,6 +380,18 @@ wps_setup() {
 	if ( $use_wps_regex_fixes ); then
 		#Replace gcc with gcc-5 if needed in the configure.wps file
 		[ "$gfortran_major_version" -ge "5" ] && $unsudo perl -0777 -i -pe 's/gcc/gcc-'"$gfortran_version"'/igs' ./configure.wps
+		#Add DM_FC and DM_CC if needed
+		local has_dm_cc=$(grep -F -e 'DM_CC[ \t]*=[a-zA-Z_0-9]+' "./configure.wps")
+		if [ "$has_dm_cc" == "" ]; then
+			local wrf_dm_cc="$(grep -F -m 1 -E 'DM_CC[ \t]*=.*?$' ../WRFV3/configure.wrf)"
+			$unsudo perl -0777 -i -pe 's/([^\r\n]*(\$\(DM_CC\)|\$DM_CC))/'"$(echo $wrf_dm_cc | sed 's/\$/\\\$/g')"'\n$1/is' ./configure.wps
+		fi
+		local has_dm_fc=$(grep -F -e 'DM_FC[ \t]*=[a-zA-Z_0-9]+' "./configure.wps")
+		if [ "$has_dm_fc" == "" ]; then
+			local wrf_dm_fc="$(grep -F -m 1 -E 'DM_FC[ \t]*=.*?$' ../WRFV3/configure.wrf)"
+			$unsudo perl -0777 -i -pe 's/([^\r\n]*(\$\(DM_FC\)|\$DM_FC))/'"$(echo $wrf_dm_fc | sed 's/\$/\\\$/g')"'\n$1/is' ./configure.wps
+		fi
+		$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.wps
 		#Add -lcairo, -lfontconfig, -lpixman-1, and -lfreetype to NCARG_LIBS
 		$unsudo perl -0777 -i -pe 's/(NCARG_LIBS[ \t]*=([^\\\n]*\\\n)*[^\n]*)\n/$1 -lcairo -lfontconfig -lpixman-1 -lfreetype\n/is' ./configure.wps
 		#Add -lgomp to WRF_LIBS
